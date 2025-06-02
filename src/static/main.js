@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 statusText = 'Game starting soon...';
                 break;
             case 'classification':
-                statusText = 'Choose Keep/Kill/Kick';
+                statusText = 'Choose Take/Trash/Tango'; // Previously Keep/Kill/Kick
                 break;
             case 'pre_kick_betting':
                 statusText = 'Pre-Kick Betting Round';
