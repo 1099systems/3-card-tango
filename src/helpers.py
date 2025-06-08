@@ -141,18 +141,19 @@ def classification_timer(table_id):
                 player['decisions']['kick'] = remaining_indices.pop(0)
             
             # Update database
-            hand = Hand.query.get(game_state['current_hand'])
-            if hand:
-                hand_player = HandPlayer.query.filter_by(
-                    hand_id=hand.id,
-                    player_id=player['id']
-                ).first()
-                
-                if hand_player:
-                    hand_player.kept_card = card_to_string(player['cards'][player['decisions']['keep']])
-                    hand_player.killed_card = card_to_string(player['cards'][player['decisions']['kill']])
-                    hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
-                    db.session.commit()
+            with app.app_context():
+                hand = Hand.query.get(game_state['current_hand'])
+                if hand:
+                    hand_player = HandPlayer.query.filter_by(
+                        hand_id=hand.id,
+                        player_id=player['id']
+                    ).first()
+                    
+                    if hand_player:
+                        hand_player.kept_card = card_to_string(player['cards'][player['decisions']['keep']])
+                        hand_player.killed_card = card_to_string(player['cards'][player['decisions']['kill']])
+                        hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
+                        db.session.commit()
     
     # Move to pre-kick betting
     game_state['state'] = 'pre_kick_betting'
@@ -195,6 +196,7 @@ def betting_timer(table_id):
     socketio.emit('game_state_update', game_state, room=f'table_{table_id}')
 
 def process_classification_action(player_id, table_id, action_type, action_data):
+    print('batman in process')
     """Process a classification action (keep/kill/kick)."""
     game_state = game_states.get(table_id)
     
@@ -258,6 +260,7 @@ def process_classification_action(player_id, table_id, action_type, action_data)
 
 def process_betting_action(player_id, table_id, action_type, action_data):
     """Process a betting action (check/bet/fold)."""
+    print('batman in process')
     game_state = game_states.get(table_id)
     
     if not game_state or game_state['state'] not in ['pre_kick_betting', 'post_turn_betting', 'final_betting']:

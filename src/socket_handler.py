@@ -55,7 +55,7 @@ def handle_join_table(data):
             db.session.add(active_game)
             db.session.commit()
             
-            # Initialize game state
+            
             game_states[suitable_table.id] = {
                 'game_id': active_game.id,
                 'players': [],
@@ -66,6 +66,20 @@ def handle_join_table(data):
                 'timer': None,
                 'chat_enabled': True
             }
+            
+        # Initialize game state
+        if suitable_table.id not in game_states:
+            game_states[suitable_table.id] = {
+                'game_id': active_game.id,
+                'players': [],
+                'state': 'waiting',
+                'deck': shuffle_deck(create_deck()),
+                'pot': 0,
+                'current_hand': None,
+                'timer': None,
+                'chat_enabled': True
+            }
+
         
         # Find an available seat
         existing_seats = [gp.seat_position for gp in GamePlayer.query.filter_by(game_id=active_game.id)]
@@ -204,6 +218,7 @@ def handle_player_action(data):
     # Process action based on game state and action type
     if game_state['state'] == 'classification':
         if action_type in ['keep', 'kill', 'kick']:
+            print('batman processing?')
             process_classification_action(player.id, int(table_id), action_type, action_data)
     elif game_state['state'] in ['pre_kick_betting', 'post_turn_betting', 'final_betting']:
         if action_type in ['check', 'bet', 'fold']:
