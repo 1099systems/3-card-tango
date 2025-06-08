@@ -1,5 +1,5 @@
 
-from main import game_states, socketio
+from main import game_states, socketio, app
 from card_utils import deal_cards, card_to_string, cards_to_string, shuffle_deck, create_deck
 from src.models.models import Table, Game, GamePlayer, Hand, HandPlayer
 from src.models import db
@@ -78,28 +78,29 @@ def start_game(table_id):
         player['decisions'] = {'keep': None, 'kill': None, 'kick': None}
     
     # Create a new hand
-    game = Game.query.get(game_state['game_id'])
-    if game:
-        hand = Hand(
-            game_id=game.id,
-            hand_number=1  # First hand
-        )
-        db.session.add(hand)
-        db.session.commit()
-        
-        # Save initial cards for each player
-        for player in game_state['players']:
-            hand_player = HandPlayer(
-                hand_id=hand.id,
-                player_id=player['id'],
-                initial_cards=cards_to_string(player['cards'])
+    with app.app_context():
+        game = Game.query.get(game_state['game_id'])
+        if game:
+            hand = Hand(
+                game_id=game.id,
+                hand_number=1  # First hand
             )
-            db.session.add(hand_player)
+            db.session.add(hand)
+            db.session.commit()
+            
+            # Save initial cards for each player
+            for player in game_state['players']:
+                hand_player = HandPlayer(
+                    hand_id=hand.id,
+                    player_id=player['id'],
+                    initial_cards=cards_to_string(player['cards'])
+                )
+                db.session.add(hand_player)
+            
+            db.session.commit()
+            
+            game_state['current_hand'] = hand.id
         
-        db.session.commit()
-        
-        game_state['current_hand'] = hand.id
-    
     # Start classification timer
     socketio.start_background_task(classification_timer, table_id)
     
