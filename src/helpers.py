@@ -70,7 +70,7 @@ def start_game(table_id):
     
     # Update game state
     game_state['state'] = 'classification'
-    game_state['timer'] = 30  # 7 seconds for classification decisions
+    game_state['timer'] = 100  # 7 seconds for classification decisions
     game_state['chat_enabled'] = False  # Disable chat during gameplay
     
     # Deal cards to players

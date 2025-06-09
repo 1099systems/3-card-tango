@@ -553,7 +553,7 @@ h6,
 
 .timer {
     position: absolute;
-    top: 20px;
+    top: 40px;
     left: 50%;
     transform: translateX(-50%);
     font-family: "Orbitron", sans-serif;
@@ -565,7 +565,7 @@ h6,
 
 .game-status {
     position: absolute;
-    bottom: 20px;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
     font-family: "Orbitron", sans-serif;
