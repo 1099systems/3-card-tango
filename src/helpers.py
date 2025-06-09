@@ -474,7 +474,6 @@ def end_hand(table_id):
         'username': winner['username'],
         'hand_strength': winner.get('hand_strength', 0)
     }
-    game_state['pot'] = 0
     game_state['chat_enabled'] = True  # Re-enable chat
     game_state['timer'] = 10  # 10 seconds before next hand
     
@@ -486,6 +485,8 @@ def end_hand(table_id):
     
     # Start timer for next hand
     socketio.start_background_task(next_hand_timer, table_id)
+    # Reset pot
+    game_state['pot'] = 0
 
 def next_hand_timer(table_id):
     """Timer for starting the next hand."""
