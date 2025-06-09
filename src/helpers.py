@@ -1,5 +1,5 @@
 
-from main import game_states, socketio, app
+from main import game_states, socketio, app, timer_config
 from card_utils import deal_cards, card_to_string, cards_to_string, shuffle_deck, create_deck
 from src.models.models import Table, Game, GamePlayer, Hand, HandPlayer
 from src.models import db
@@ -70,7 +70,7 @@ def start_game(table_id):
     
     # Update game state
     game_state['state'] = 'classification'
-    game_state['timer'] = 100  # 7 seconds for classification decisions
+    game_state['timer'] = timer_config['classification']  # 7 seconds for classification decisions
     game_state['chat_enabled'] = False  # Disable chat during gameplay
     
     # Deal cards to players
@@ -158,7 +158,7 @@ def classification_timer(table_id):
     
     # Move to pre-kick betting
     game_state['state'] = 'pre_kick_betting'
-    game_state['timer'] = 7  # 7 seconds for betting
+    game_state['timer'] = timer_config['betting']  # 7 seconds for betting
     game_state['current_bet'] = 0
     game_state['current_player_index'] = 0
     
@@ -252,7 +252,7 @@ def process_classification_action(player_id, table_id, action_type, action_data)
     if all_decisions_made:
         # Move to pre-kick betting
         game_state['state'] = 'pre_kick_betting'
-        game_state['timer'] = 7  # 7 seconds for betting
+        game_state['timer'] = timer_config['betting']  # 7 seconds for betting
         game_state['current_bet'] = 0
         game_state['current_player_index'] = 0
         
@@ -351,7 +351,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
                 
                 # Move to post-turn betting
                 game_state['state'] = 'post_turn_betting'
-                game_state['timer'] = 7  # 7 seconds for betting
+                game_state['timer'] = timer_config['betting']  # 7 seconds for betting
                 game_state['current_bet'] = 0
                 game_state['current_player_index'] = 0
                 
@@ -385,7 +385,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
                 
                 # Move to final betting
                 game_state['state'] = 'final_betting'
-                game_state['timer'] = 7  # 7 seconds for betting
+                game_state['timer'] = timer_config['betting']  # 7 seconds for betting
                 game_state['current_bet'] = 0
                 game_state['current_player_index'] = 0
                 
@@ -398,11 +398,11 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         else:
             # Move to next player
             game_state['current_player_index'] = next_player_index
-            game_state['timer'] = 7  # Reset timer for next player
+            game_state['timer'] = timer_config['next_player']  # Reset timer for next player
     except:
         # Move to next player
         game_state['current_player_index'] = next_player_index
-        game_state['timer'] = 7  # Reset timer for next player
+        game_state['timer'] = timer_config['next_player']  # Reset timer for next player
     
     return True
 
@@ -475,7 +475,7 @@ def end_hand(table_id):
         'hand_strength': winner.get('hand_strength', 0)
     }
     game_state['chat_enabled'] = True  # Re-enable chat
-    game_state['timer'] = 10  # 10 seconds before next hand
+    game_state['timer'] = timer_config['next_hand']  # 10 seconds before next hand
     
     # Send hand result to all players
     socketio.emit('hand_result', {

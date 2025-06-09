@@ -11,6 +11,13 @@ app.config['SECRET_KEY'] = 'three_card_tango_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///poker_game.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+timer_config = {
+    'classification': 7,
+    'betting': 7,
+    'next_player': 7,
+    'next_hand': 10,
+}
+
 # Initialize SocketIO
 socketio = SocketIO(app, cors_allowed_origins="*")
 
