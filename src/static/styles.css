@@ -578,7 +578,7 @@ h6,
 .chat-container {
     width: 100%;
     max-width: 1000px;
-    margin: 0 auto;
+    margin: 60px auto;
     background-color: var(--card-bg);
     border-radius: 10px;
     overflow: hidden;
