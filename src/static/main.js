@@ -1,5 +1,44 @@
 var gameState;
 
+// Socket Connection
+const socket = io();
+
+async function debugAddPlayer(username) {
+    getPlayerOrCreate(username, username).then((result) => {
+        socket.emit('join_table', {
+            session_id: result.sessionId
+        });
+    });
+}
+
+async function getPlayerOrCreate(sessionId, username) {
+    try {
+        const response = await fetch('/api/player', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                session_id: sessionId,
+                username: username
+            })
+        });
+
+        const data = await response.json();
+        let player = {};
+        player.id = data.id;
+        player.sessionId = data.session_id;
+        player.username = data.username;
+        player.chips = data.chips;
+        player.isPermanent = data.is_permanent;
+
+        return player;
+    } catch (error) {
+        console.error('Error getting or creating player data:', error);
+    }
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
     // DOM Elements
     const loginCard = document.getElementById('login-card');
@@ -45,8 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
         chatEnabled: true
     };
 
-    // Socket Connection
-    const socket = io();
 
     // Initialize
     init();
@@ -86,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // API Functions
     async function fetchPlayerData() {
         try {
+            const result = await getPlayerOrCreate(player.sessionId);
             const response = await fetch('/api/player', {
                 method: 'POST',
                 headers: {
@@ -96,16 +134,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
             });
 
-            const data = await response.json();
-
-            player.id = data.id;
-            player.sessionId = data.session_id;
-            player.username = data.username;
-            player.chips = data.chips;
-            player.isPermanent = data.is_permanent;
-
             // Save session ID
-            localStorage.setItem('sessionId', player.sessionId);
+            localStorage.setItem('sessionId', result.sessionId);
 
             // Update UI
             updatePlayerInfo();
@@ -208,7 +238,6 @@ document.addEventListener('DOMContentLoaded', function () {
             gameState.tableId = response.table_id;
             gameState.gameId = response.game_id;
 
-            // Show game container
             loginCard.classList.add('hidden');
             gameContainer.style.display = 'block';
         }

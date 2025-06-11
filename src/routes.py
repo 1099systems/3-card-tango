@@ -12,10 +12,11 @@ def index():
     return render_template('index.html')
 
 @app.route('/api/player', methods=['POST'])
-def create_player():
+def get_player_in_session_or_create():
     """Create a new player or retrieve existing player by session ID."""
     data = request.json
     session_id = data.get('session_id')
+    username = data.get('username')
     
     if not session_id:
         session_id = str(uuid.uuid4())
@@ -23,7 +24,10 @@ def create_player():
     player = Player.query.filter_by(session_id=session_id).first()
     
     if not player:
-        player = Player(session_id=session_id, chips=100)
+        if username:
+            player = Player(session_id=session_id, username=username, chips=100)
+        else:
+            player = Player(session_id=session_id, chips=100)
         db.session.add(player)
         db.session.commit()
     
