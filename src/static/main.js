@@ -12,6 +12,7 @@ async function debugAddPlayer(username) {
 }
 
 function debugNextPhase() {
+    // BATMAN TODO: instead of passing string for states, create test state object with updated data (cards, chips, etc), and pass it!
     switch (gameState.state) {
         case 'waiting':
             debugUpdateGameState('starting');
