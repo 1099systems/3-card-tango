@@ -46,7 +46,8 @@ def handle_join_table(data):
         Game.status == 'active'
     ).first()
     
-    if not existing_game_player:
+    # game_states == 0 if server restarted since game_states is session-based (non-DB)
+    if not existing_game_player or len(game_states) == 0:
         # Add player to the table
         active_game = Game.query.filter_by(table_id=suitable_table.id, status='active').first()
         
@@ -119,6 +120,7 @@ def handle_join_table(data):
             start_timer('start', suitable_table.id)
     
     # Send updated game state to all players at the table
+    # NOTE: game_states here can be empty if the server restarted
     emit('game_state_update', game_states.get(suitable_table.id, {}), room=f'table_{suitable_table.id}')
     
     # Notify other players

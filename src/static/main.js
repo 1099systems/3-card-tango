@@ -1,3 +1,5 @@
+var gameState;
+
 document.addEventListener('DOMContentLoaded', function () {
     // DOM Elements
     const loginCard = document.getElementById('login-card');
@@ -30,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         isPermanent: false
     };
 
-    let gameState = {
+    gameState = {
         tableId: null,
         gameId: null,
         state: 'waiting',
@@ -462,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const chipsElement = position.querySelector('.player-chips');
 
             nameElement.textContent = player.username || `Player ${player.id}`;
-            chipsElement.textContent = player.chips;
+            chipsElement.textContent = player.chips + ' chips';
 
             // Add status indicator if folded
             if (player.status === 'folded') {
