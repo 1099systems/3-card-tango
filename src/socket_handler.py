@@ -3,8 +3,9 @@ from datetime import datetime
 from src.models.models import Player, Game, GamePlayer, ChatMessage
 from src.models import db
 from flask_socketio import emit, join_room, leave_room
-from helpers import find_suitable_table, countdown_to_start, process_betting_action, process_classification_action
+from helpers import find_suitable_table, process_betting_action, process_classification_action
 from card_utils import shuffle_deck, create_deck
+from timer import start_timer
 
 # SocketIO events
 @socketio.on('connect')
@@ -115,7 +116,7 @@ def handle_join_table(data):
         if len(game_state['players']) >= 2 and game_state['state'] == 'waiting':
             game_state['state'] = 'starting'
             game_state['timer'] = 10  # 10 second countdown to start
-            socketio.start_background_task(countdown_to_start, suitable_table.id)
+            start_timer('start', suitable_table.id)
     
     # Send updated game state to all players at the table
     emit('game_state_update', game_states.get(suitable_table.id, {}), room=f'table_{suitable_table.id}')
@@ -198,6 +199,9 @@ def handle_player_action(data):
     table_id = data.get('table_id')
     action_type = data.get('action_type')
     action_data = data.get('action_data', {})
+
+    player_action_string = 'Player made action ' + str(data.get(action_type))
+    print(player_action_string)
     
     if not session_id or not table_id or not action_type:
         emit('error', {'message': 'Session ID, table ID, and action type are required'})
@@ -218,7 +222,6 @@ def handle_player_action(data):
     # Process action based on game state and action type
     if game_state['state'] == 'classification':
         if action_type in ['keep', 'kill', 'kick']:
-            print('batman processing?')
             process_classification_action(player.id, int(table_id), action_type, action_data)
     elif game_state['state'] in ['pre_kick_betting', 'post_turn_betting', 'final_betting']:
         if action_type in ['check', 'bet', 'fold']:

@@ -1,17 +1,41 @@
+import os
 from main import game_states, socketio, app, timer_config
 from card_utils import deal_cards, card_to_string, cards_to_string, shuffle_deck, create_deck
 from src.models.models import Table, Game, GamePlayer, Hand, HandPlayer
 from src.models import db
 
 def start_timer(phase, table_id):
+    timer_disabled = os.getenv('DEBUG_DISABLE_TIMER')
+    if timer_disabled:
+        print('Timer is disabled. Please continue the game using manual console commands.')
+        return
     print('Starting timer...')
-    if phase == 'betting':
+    if phase == 'start':
+        socketio.start_background_task(countdown_to_start, table_id)
+    elif phase == 'betting':
         socketio.start_background_task(betting_timer, table_id)
     elif phase == 'next_hand':
         socketio.start_background_task(next_hand_timer, table_id)
     elif phase == 'classification':
         socketio.start_background_task(classification_timer, table_id)
 
+
+def countdown_to_start(table_id):
+    """Countdown to start the game."""
+    table_id = int(table_id)
+    game_state = game_states.get(table_id)
+    
+    if not game_state or game_state['state'] != 'starting':
+        return
+    
+    while game_state['timer'] > 0:
+        socketio.sleep(1)
+        game_state['timer'] -= 1
+        socketio.emit('timer_update', {'timer': game_state['timer']}, room=f'table_{table_id}')
+    
+    # Start the game
+    from helpers import start_game
+    start_game(table_id)
 
 def classification_timer(table_id):
     """Timer for classification phase."""

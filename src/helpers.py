@@ -45,22 +45,6 @@ def find_suitable_table(chips):
     
     return available_table
 
-def countdown_to_start(table_id):
-    """Countdown to start the game."""
-    table_id = int(table_id)
-    game_state = game_states.get(table_id)
-    
-    if not game_state or game_state['state'] != 'starting':
-        return
-    
-    while game_state['timer'] > 0:
-        socketio.sleep(1)
-        game_state['timer'] -= 1
-        socketio.emit('timer_update', {'timer': game_state['timer']}, room=f'table_{table_id}')
-    
-    # Start the game
-    start_game(table_id)
-
 def start_game(table_id):
     """Start a new game at the table."""
     table_id = int(table_id)
