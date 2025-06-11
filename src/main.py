@@ -1,14 +1,18 @@
 import sys
 import os
+from dotenv import load_dotenv
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from flask import Flask
 from flask_socketio import SocketIO
 from src.models import db
 
+load_dotenv()  # Load from .env file
+
+
 # Initialize Flask app
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'three_card_tango_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///poker_game.db'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 timer_config = {
