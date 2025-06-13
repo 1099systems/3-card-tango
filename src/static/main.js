@@ -13,18 +13,19 @@ async function debugAddPlayer(username) {
 
 function debugNextPhase() {
     // BATMAN TODO: instead of passing string for states, create test state object with updated data (cards, chips, etc), and pass it!
-    let newGameState = {
-        chatEnabled: true,
-        communityCards: [],
-        gameId: 1,
-        players: [],
-        pot: 0,
-        selectAction: null,
-        selectCard: null,
-        state: 'waiting',
-        tableId: 1,
-        timer: null
-    };
+    // let newGameState = {
+    //     chatEnabled: true,
+    //     communityCards: [],
+    //     gameId: 1,
+    //     players: [],
+    //     pot: 0,
+    //     selectAction: null,
+    //     selectCard: null,
+    //     state: 'waiting',
+    //     tableId: 1,
+    //     timer: null
+    // };
+    let newGameState = gameState;
     switch (gameState.state) {
         case 'waiting':
             newGameState.state = 'starting';
