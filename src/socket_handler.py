@@ -222,9 +222,15 @@ def handle_player_action(data):
         return
     
     # Process action based on game state and action type
-    if game_state['state'] == 'classification':
-        if action_type in ['keep', 'kill', 'kick']:
+    if game_state['state'] == 'choose_trash':
+        if action_type in ['kill']:
             process_classification_action(player.id, int(table_id), action_type, action_data)
+    elif game_state['state'] == 'choose_tango':
+        if action_type in ['kick']:
+            process_classification_action(player.id, int(table_id), action_type, action_data)
+    elif game_state['state'] in ['ante']:
+        if action_type in ['bet']:
+            process_betting_action(player.id, int(table_id), action_type, action_data)
     elif game_state['state'] in ['pre_kick_betting', 'post_turn_betting', 'final_betting']:
         if action_type in ['check', 'bet', 'fold']:
             process_betting_action(player.id, int(table_id), action_type, action_data)
