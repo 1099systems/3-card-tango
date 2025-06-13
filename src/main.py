@@ -5,14 +5,14 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from flask import Flask
 from flask_socketio import SocketIO
 from src.models import db
+import uuid
 
 load_dotenv()  # Load from .env file
-
 
 # Initialize Flask app
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL') + '_' +  uuid.uuid4().hex + '.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 timer_config = {

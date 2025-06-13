@@ -115,9 +115,9 @@ def handle_join_table(data):
         
         # Check if we should start the game
         if len(game_state['players']) >= 2 and game_state['state'] == 'waiting':
-            game_state['state'] = 'starting'
-            game_state['timer'] = 10  # 10 second countdown to start
-            start_timer('start', suitable_table.id)
+            game_state['state'] = 'ante'
+            # game_state['timer'] = 10  # 10 second countdown to start
+            # start_timer('start', suitable_table.id)
     
     # Send updated game state to all players at the table
     # NOTE: game_states here can be empty if the server restarted

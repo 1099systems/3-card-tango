@@ -28,16 +28,13 @@ function debugNextPhase() {
     let newGameState = gameState;
     switch (gameState.state) {
         case 'waiting':
-            newGameState.state = 'preparing';
+            newGameState.state = 'ante';
             debugUpdateGameState(newGameState);
             break;
         case 'ante':
             newGameState.state = 'card_draw';
-            debugUpdateGameState(newGameState);
-            break;
-        case 'card_draw':
-            newGameState.state = 'choose_trash';
-            newGameState.chat_enabled = False;
+            
+            newGameState.chat_enabled = false;
             // countdown timer starts here
             newGameState.players.forEach((player) => {
                 player['cards'] = [
@@ -63,7 +60,11 @@ function debugNextPhase() {
                 player['chips'] = 100
                 
             });
-            game_state['current_hander'] = 'TODO'
+            newGameState.current_hand = 'TODO'
+            debugUpdateGameState(newGameState);
+            break;
+        case 'card_draw':
+            newGameState.state = 'choose_trash';
             debugUpdateGameState(newGameState);
             break;
         case 'choose_trash':
@@ -656,9 +657,12 @@ function updatePlayerCards() {
     // Find current player
     const currentPlayer = gameState.players.find(p => p.id === player.id);
 
+    console.log('updating player cards...');
     if (currentPlayer && currentPlayer.cards) {
         // Add player cards
+        console.log('adding player cards for ' + currentPlayer);
         currentPlayer.cards.forEach((card, index) => {
+            console.log('adding card ' + card);
             const cardElement = createCardElement(card);
 
             // Add selected class if this card is selected
@@ -673,7 +677,9 @@ function updatePlayerCards() {
             });
 
             playerCardsElement.appendChild(cardElement);
+            console.log('added   card ' + card);
         });
+        console.log('added player cards!');
 
         // Add turn card if available
         if (currentPlayer.turn_card) {
@@ -689,12 +695,19 @@ function updateControls() {
     bettingControls.classList.add('hidden');
 
     // Show appropriate controls based on game state
-    if (gameState.state === 'classification') {
+    if (gameState.state == 'ante') {
+        bettingControls.classList.remove('hidden');
+        document.getElementById('bet-btn').onclick = placeBet;
+    }
+    if (gameState.state === 'choose_trash') {
         cardActions.classList.remove('hidden');
 
         // Add event listeners
-        document.getElementById('keep-action').onclick = () => selectAction('keep');
         document.getElementById('kill-action').onclick = () => selectAction('kill');
+    } else if (gameState.state === 'choose_tango') {
+        cardActions.classList.remove('hidden');
+
+        // Add event listeners
         document.getElementById('kick-action').onclick = () => selectAction('kick');
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
         bettingControls.classList.remove('hidden');
