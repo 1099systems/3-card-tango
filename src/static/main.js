@@ -44,8 +44,28 @@ function debugNextPhase() {
             newGameState.chat_enabled = False;
             // countdown timer starts here
             newGameState.players.forEach((player) => {
-                player['cards'] = 
-                player['decisions'] =
+                player['cards'] = [
+                    {
+                        'rank': '6',
+                        'suit': 'clubs'
+                    },
+                    {
+                        'rank': 'A',
+                        'suit': 'diamonds'
+                    },
+                    {
+                        'rank': 'J',
+                        'suit': 'clubs'
+                    },
+                ]
+                player['decisions'] = {
+                    'keep': null, // 0
+                    'kick': null, // 2
+                    'kill': null // 1
+                }
+                player['last_action'] = 'check'
+                player['chips'] = 100
+                
             });
             game_state['current_hander'] = 'TODO'
             debugUpdateGameState(newGameState);
