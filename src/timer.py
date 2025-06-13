@@ -5,10 +5,10 @@ from src.models.models import Table, Game, GamePlayer, Hand, HandPlayer
 from src.models import db
 
 def start_timer(phase, table_id):
-    # timer_disabled = os.getenv('DEBUG_DISABLE_TIMER')
-    # if timer_disabled:
-    #     print('Timer is disabled. Please continue the game using manual console commands.')
-    #     return
+    timer_disabled = os.getenv('DEBUG_DISABLE_TIMER')
+    if timer_disabled:
+        print('Timer is disabled. Please continue the game using manual console commands.')
+        return
     print('Starting timer...')
     if phase == 'start':
         socketio.start_background_task(countdown_to_start, table_id)

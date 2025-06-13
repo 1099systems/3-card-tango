@@ -31,10 +31,6 @@ function debugNextPhase() {
             newGameState.state = 'preparing';
             debugUpdateGameState(newGameState);
             break;
-        case 'preparing':
-            newGameState.state = 'ante';
-            debugUpdateGameState(newGameState);
-            break;
         case 'ante':
             newGameState.state = 'card_draw';
             debugUpdateGameState(newGameState);
@@ -564,20 +560,26 @@ function updateGameStatus() {
         case 'waiting':
             statusText = 'Waiting for players...';
             break;
-        case 'starting':
-            statusText = 'Game starting soon...';
+        case 'ante':
+            statusText = 'Before starting, please put an ante in the pot.';
             break;
-        case 'classification':
-            statusText = 'Choose Take/Trash/Tango'; // Previously Keep/Kill/Kick
+        case 'card_draw':
+            statusText = 'Cards are drawn. Game starting soon...';
+            break;
+        case 'choose_trash':
+            statusText = 'Choose Card to Trash!';
+            break;
+        case 'choose_tango':
+            statusText = 'Choose Card to Tango!';
             break;
         case 'pre_kick_betting':
-            statusText = 'Pre-Kick Betting Round';
+            statusText = 'Pre-Draw-Card Betting Round';
             break;
         case 'turn_draw':
-            statusText = 'Drawing Turn Card';
+            statusText = 'Draw Card Round';
             break;
         case 'post_turn_betting':
-            statusText = 'Post-Turn Betting Round';
+            statusText = 'Post-Draw-Card Betting Round';
             break;
         case 'board_reveal':
             statusText = 'Revealing Community Cards';
@@ -589,7 +591,7 @@ function updateGameStatus() {
             statusText = 'Showdown';
             break;
         case 'end':
-            statusText = 'Hand Complete';
+            statusText = 'Player X Wins Pot! (XYZ)';
             break;
         default:
             statusText = gameState.state;
