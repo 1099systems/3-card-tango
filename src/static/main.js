@@ -13,36 +13,58 @@ async function debugAddPlayer(username) {
 
 function debugNextPhase() {
     // BATMAN TODO: instead of passing string for states, create test state object with updated data (cards, chips, etc), and pass it!
+    let newGameState = {
+        chatEnabled: true,
+        communityCards: [],
+        gameId: 1,
+        players: [],
+        pot: 0,
+        selectAction: null,
+        selectCard: null,
+        state: 'waiting',
+        tableId: 1,
+        timer: null
+    };
     switch (gameState.state) {
         case 'waiting':
-            debugUpdateGameState('starting');
+            newGameState.state = 'starting';
+            debugUpdateGameState(newGameState);
             break;
         case 'starting':
-            debugUpdateGameState('classification');
+            newGameState.state = 'classification';
+            debugUpdateGameState(newGameState);
             break;
         case 'classification':
-            debugUpdateGameState('pre_kick_betting');
+            newGameState.state = 'pre_kick_betting';
+            debugUpdateGameState(newGameState);
             break;
         case 'pre_kick_betting':
-            debugUpdateGameState('turn_draw');
+            newGameState.state = 'turn_draw';
+            debugUpdateGameState(newGameState);
             break;
         case 'turn_draw':
-            debugUpdateGameState('post_turn_betting');
+            newGameState.state = 'post_turn_betting';
+            debugUpdateGameState(newGameState);
             break;
         case 'post_turn_betting':
-            debugUpdateGameState('board_reveal');
+            newGameState.state = 'board_reveal';
+            debugUpdateGameState(newGameState);
             break;
         case 'board_reveal':
-            debugUpdateGameState('final_betting');
+            newGameState.state = 'final_betting';
+            debugUpdateGameState(newGameState);
             break;
         case 'final_betting':
-            debugUpdateGameState('showdown');
+            newGameState.state = 'showdown';
+            debugUpdateGameState(newGameState);
             break;
         case 'showdown':
-            debugUpdateGameState('end');
+            newGameState.state = 'end';
+            debugUpdateGameState(newGameState);
             break;
         case 'end':
-            debugUpdateGameState('end');
+            newGameState.state = 'end';
+            debugUpdateGameState(newGameState);
             break;
         default:
             statusText = gameState.state;
@@ -76,11 +98,15 @@ async function getPlayerOrCreate(sessionId, username) {
     }
 }
 
-function debugUpdateGameState(newState) {
+function debugUpdateGameState(state) {
     // Update game state
-    gameState.state = newState;
+    gameState.state = state.state;
+    gameState.players = state.players || [];
+    gameState.pot = state.pot || 0;
+    gameState.timer = state.timer;
+    gameState.chatEnabled = state.chat_enabled !== false;
 
-    updateUI();
+    updateUI(state);
 }
 
 function updateUI(state) {
