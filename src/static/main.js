@@ -42,6 +42,7 @@ function debugNextPhase() {
             debugUpdateGameState(newGameState);
             break;
         case 'classification':
+            // TODO: breakdown classification phase to choose_trash, choose_tango
             newGameState.state = 'pre_kick_betting';
             newGameState.current_bet = ''
             newGameState.current_player_index = ''
