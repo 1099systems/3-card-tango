@@ -128,7 +128,6 @@ async function getPlayerOrCreate(sessionId, username) {
         });
 
         const data = await response.json();
-        let player = {};
         player.id = data.id;
         player.sessionId = data.session_id;
         player.username = data.username;
@@ -249,15 +248,6 @@ function init() {
 async function fetchPlayerData() {
     try {
         const result = await getPlayerOrCreate(player.sessionId);
-        const response = await fetch('/api/player', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                session_id: player.sessionId
-            })
-        });
 
         // Save session ID
         localStorage.setItem('sessionId', result.sessionId);
@@ -651,13 +641,14 @@ function updateCommunityCards(cards) {
 }
 
 function updatePlayerCards() {
+    console.log('updating player cards...');
     // Clear player cards
     playerCardsElement.innerHTML = '';
 
     // Find current player
+
     const currentPlayer = gameState.players.find(p => p.id === player.id);
 
-    console.log('updating player cards...');
     if (currentPlayer && currentPlayer.cards) {
         // Add player cards
         console.log('adding player cards for ' + currentPlayer);
