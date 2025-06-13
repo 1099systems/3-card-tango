@@ -175,7 +175,9 @@ const joinBtn = document.getElementById('join-btn');
 const setUsernameBtn = document.getElementById('set-username-btn');
 const claimChipsBtn = document.getElementById('claim-chips-btn');
 const cardActions = document.getElementById('card-actions');
-const bettingControls = document.getElementById('betting-controls');
+const checkBtn = document.getElementById('check-btn');
+const betBtn = document.getElementById('bet-btn');
+const foldBtn = document.getElementById('fold-btn');
 const timerElement = document.getElementById('timer');
 const gameStatusElement = document.getElementById('game-status');
 const potElement = document.getElementById('pot');
@@ -683,11 +685,13 @@ function updatePlayerCards() {
 function updateControls() {
     // Hide all controls
     cardActions.classList.add('hidden');
-    bettingControls.classList.add('hidden');
+    checkBtn.classList.add('hidden');
+    betBtn.classList.add('hidden');
+    foldBtn.classList.add('hidden');
 
     // Show appropriate controls based on game state
     if (gameState.state == 'ante') {
-        bettingControls.classList.remove('hidden');
+        betBtn.classList.remove('hidden');
         document.getElementById('bet-btn').onclick = placeBet;
     }
     if (gameState.state === 'choose_trash') {
@@ -701,7 +705,9 @@ function updateControls() {
         // Add event listeners
         document.getElementById('kick-action').onclick = () => selectAction('kick');
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
-        bettingControls.classList.remove('hidden');
+        checkBtn.classList.remove('hidden');
+        betBtn.classList.remove('hidden');
+        foldBtn.classList.remove('hidden');
 
         // Add event listeners
         document.getElementById('check-btn').onclick = check;
