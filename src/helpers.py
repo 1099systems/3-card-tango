@@ -182,6 +182,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         player['last_action'] = 'check'
     
     elif action_type == 'bet':
+        # TODO batman: add to pot even if in anter
         bet_amount = action_data.get('amount', 0)
         
         if bet_amount <= 0 or bet_amount > player['chips']:
