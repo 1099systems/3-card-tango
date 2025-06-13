@@ -28,21 +28,35 @@ function debugNextPhase() {
     let newGameState = gameState;
     switch (gameState.state) {
         case 'waiting':
-            newGameState.state = 'starting';
+            newGameState.state = 'preparing';
             debugUpdateGameState(newGameState);
             break;
-        case 'starting':
-            newGameState.state = 'classification';
+        case 'preparing':
+            newGameState.state = 'ante';
+            debugUpdateGameState(newGameState);
+            break;
+        case 'ante':
+            newGameState.state = 'card_draw';
+            debugUpdateGameState(newGameState);
+            break;
+        case 'card_draw':
+            newGameState.state = 'choose_trash';
             newGameState.chat_enabled = False;
+            // countdown timer starts here
             newGameState.players.forEach((player) => {
                 player['cards'] = 
-                player['decisions']
+                player['decisions'] =
             });
-            game_state['current_hander'] = ???
+            game_state['current_hander'] = 'TODO'
             debugUpdateGameState(newGameState);
             break;
-        case 'classification':
-            // TODO: breakdown classification phase to choose_trash, choose_tango
+        case 'choose_trash':
+            newGameState.state = 'choose_tango';
+            newGameState.current_bet = ''
+            newGameState.current_player_index = ''
+            debugUpdateGameState(newGameState);
+            break;
+        case 'choose_tango':
             newGameState.state = 'pre_kick_betting';
             newGameState.current_bet = ''
             newGameState.current_player_index = ''
@@ -51,6 +65,7 @@ function debugNextPhase() {
         case 'pre_kick_betting':
             // TODO: player bets, decrease player['chips'], increate gamestate['pot']
             newGameState.state = 'turn_draw';
+            // new card drawn
             debugUpdateGameState(newGameState);
             break;
         case 'turn_draw':
@@ -74,7 +89,7 @@ function debugNextPhase() {
             debugUpdateGameState(newGameState);
             break;
         case 'end':
-            newGameState.state = 'end';
+            newGameState.state = 'next_game_countdown';
             debugUpdateGameState(newGameState);
             break;
         default:
