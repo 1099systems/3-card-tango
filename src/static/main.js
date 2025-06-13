@@ -33,13 +33,22 @@ function debugNextPhase() {
             break;
         case 'starting':
             newGameState.state = 'classification';
+            newGameState.chat_enabled = False;
+            newGameState.players.forEach((player) => {
+                player['cards'] = 
+                player['decisions']
+            });
+            game_state['current_hander'] = ???
             debugUpdateGameState(newGameState);
             break;
         case 'classification':
             newGameState.state = 'pre_kick_betting';
+            newGameState.current_bet = ''
+            newGameState.current_player_index = ''
             debugUpdateGameState(newGameState);
             break;
         case 'pre_kick_betting':
+            // TODO: player bets, decrease player['chips'], increate gamestate['pot']
             newGameState.state = 'turn_draw';
             debugUpdateGameState(newGameState);
             break;
