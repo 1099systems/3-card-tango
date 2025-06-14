@@ -99,7 +99,7 @@ def process_classification_action(player_id, table_id, action_type, action_data)
     """Process a classification action (keep/kill/kick)."""
     game_state = game_states.get(table_id)
     
-    if not game_state or game_state['state'] != 'classification':
+    if not game_state or game_state['state'] not in ['choose_trash', 'choose_tango']:
         return False
     
     # Find the player
@@ -113,36 +113,30 @@ def process_classification_action(player_id, table_id, action_type, action_data)
     if card_index is None or card_index < 0 or card_index > 2:
         return False
     
-    # Check if this action conflicts with previous decisions
-    if player['decisions'][action_type] is not None:
-        # Remove the card from previous decision
-        for decision_type in ['keep', 'kill', 'kick']:
-            if player['decisions'][decision_type] == card_index:
-                player['decisions'][decision_type] = None
-    
     # Set the new decision
-    player['decisions'][action_type] = card_index
-    
-    # Update database if all decisions are made
-    if None not in [player['decisions']['keep'], player['decisions']['kill'], player['decisions']['kick']]:
-        with app.app_context():
-            hand = Hand.query.get(game_state['current_hand'])
-            if hand:
-                hand_player = HandPlayer.query.filter_by(
-                    hand_id=hand.id,
-                    player_id=player_id
-                ).first()
-                
-                if hand_player:
-                    hand_player.kept_card = card_to_string(player['cards'][player['decisions']['keep']])
-                    hand_player.killed_card = card_to_string(player['cards'][player['decisions']['kill']])
-                    hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
-                    db.session.commit()
-    
+    player.setdefault('decisions', {'keep': None, 'kill': None, 'kick': None})[action_type] = card_index
+    # Debug
+    if 'current_hand' not in game_state or game_state['current_hand'] is None:
+        game_state['current_hand'] = 0
+
+    # Update database
+    with app.app_context():
+        hand = Hand.query.get(game_state['current_hand'])
+        if hand:
+            hand_player = HandPlayer.query.filter_by(
+                hand_id=hand.id,
+                player_id=player_id
+            ).first()
+            
+            if hand_player:
+                hand_player.killed_card = card_to_string(player['cards'][player['decisions']['kill']])
+                hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
+                db.session.commit()
+
     # Check if all players have made all decisions
     all_decisions_made = True
     for p in game_state['players']:
-        if None in [p['decisions']['keep'], p['decisions']['kill'], p['decisions']['kick']]:
+        if None in [p['decisions']['kill'], p['decisions']['kick']]:
             all_decisions_made = False
             break
     

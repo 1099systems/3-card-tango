@@ -47,7 +47,8 @@ function debugNextPhase() {
                 player['chips'] = 100
                 
             });
-            newGameState.current_hand = 'TODO'
+            
+            newGameState.current_hand = 0;
             debugUpdateGameState(newGameState);
             break;
         case 'card_draw':
@@ -162,7 +163,8 @@ const chipCountDisplay = document.getElementById('chip-count-display');
 const joinBtn = document.getElementById('join-btn');
 const setUsernameBtn = document.getElementById('set-username-btn');
 const claimChipsBtn = document.getElementById('claim-chips-btn');
-const cardActions = document.getElementById('card-actions');
+const cardActionsTrash = document.getElementById('card-actions-trash');
+const cardActionsTango = document.getElementById('card-actions-tango');
 const checkBtn = document.getElementById('check-btn');
 const betBtn = document.getElementById('bet-btn');
 const foldBtn = document.getElementById('fold-btn');
@@ -673,7 +675,8 @@ function updatePlayerCards() {
 
 function updateControls() {
     // Hide all controls
-    cardActions.classList.add('hidden');
+    cardActionsTrash.classList.add('hidden');
+    cardActionsTango.classList.add('hidden');
     checkBtn.classList.add('hidden');
     betBtn.classList.add('hidden');
     foldBtn.classList.add('hidden');
@@ -684,15 +687,37 @@ function updateControls() {
         document.getElementById('bet-btn').onclick = placeBet;
     }
     if (gameState.state === 'choose_trash') {
-        cardActions.classList.remove('hidden');
+        cardActionsTrash.classList.remove('hidden');
 
         // Add event listeners
-        document.getElementById('kill-action').onclick = () => selectAction('kill');
+        document.getElementById('kill-action-1').onclick = () => {
+            gameState.selectedCard = 0;
+            selectAction('kill');
+        };
+        document.getElementById('kill-action-2').onclick = () => {
+            gameState.selectedCard = 1;
+            selectAction('kill');
+        };
+        document.getElementById('kill-action-3').onclick = () => {
+            gameState.selectedCard = 2;
+            selectAction('kill');
+        };
     } else if (gameState.state === 'choose_tango') {
-        cardActions.classList.remove('hidden');
+        cardActionsTango.classList.remove('hidden');
 
         // Add event listeners
-        document.getElementById('kick-action').onclick = () => selectAction('kick');
+        document.getElementById('kick-action-1').onclick = () => {
+            gameState.selectedCard = 0;
+            selectAction('kick');
+        };
+        document.getElementById('kick-action-2').onclick = () => {
+            gameState.selectedCard = 1;
+            selectAction('kick');
+        };
+        document.getElementById('kick-action-3').onclick = () => {
+            gameState.selectedCard = 2;
+            selectAction('kick');
+        };
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
         checkBtn.classList.remove('hidden');
         betBtn.classList.remove('hidden');

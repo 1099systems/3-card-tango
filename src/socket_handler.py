@@ -115,11 +115,8 @@ def handle_join_table(data):
         
         # Check if we should start the game
         if len(game_state['players']) >= 2 and game_state['state'] == 'waiting':
-            game_state['state'] = 'ante'
-            game_state['current_player_index'] = 0
-            game_state['current_bet'] = 0
-            # game_state['timer'] = 10  # 10 second countdown to start
-            # start_timer('start', suitable_table.id)
+            from game import moveGameStateToNext
+            moveGameStateToNext(game_state)
     
     # Send updated game state to all players at the table
     # NOTE: game_states here can be empty if the server restarted
@@ -204,8 +201,9 @@ def handle_player_action(data):
     action_type = data.get('action_type')
     action_data = data.get('action_data', {})
 
-    player_action_string = 'Player made action ' + str(data.get(action_type))
+    player_action_string = 'Player made action ' + action_type
     print(player_action_string)
+
     
     if not session_id or not table_id or not action_type:
         emit('error', {'message': 'Session ID, table ID, and action type are required'})
@@ -223,6 +221,12 @@ def handle_player_action(data):
         emit('error', {'message': 'Game not found'})
         return
     
+    # Fix gamestate. This is important for debug mode.
+    if action_type == 'kill':
+        game_state['state'] = 'choose_trash'
+    elif action_type == 'kick':
+        game_state['state'] = 'choose_tango'
+
     # Process action based on game state and action type
     if game_state['state'] == 'choose_trash':
         if action_type in ['kill']:
