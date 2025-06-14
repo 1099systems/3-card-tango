@@ -16,7 +16,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL') + '_' +  uuid.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 timer_config = {
-    'classification': 7,
+    'card_draw': 10,
+    'choose_trash': 7,
+    'choose_tango': 7,
     'betting': 7,
     'next_player': 7,
     'next_hand': 10,

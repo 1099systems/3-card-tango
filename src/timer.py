@@ -10,7 +10,8 @@ def start_timer(phase, table_id):
         print('Timer is disabled. Please continue the game using manual console commands.')
         return
     print('Starting timer...')
-    if phase == 'start':
+
+    if phase == 'choose_trash':
         socketio.start_background_task(countdown_to_start, table_id)
     elif phase == 'betting':
         socketio.start_background_task(betting_timer, table_id)
@@ -21,7 +22,7 @@ def start_timer(phase, table_id):
 
 
 def countdown_to_start(table_id):
-    """Countdown to start the game."""
+    """Countdown to start the game, starting with choose_trash."""
     table_id = int(table_id)
     game_state = game_states.get(table_id)
     

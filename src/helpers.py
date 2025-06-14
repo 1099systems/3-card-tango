@@ -54,41 +54,10 @@ def start_game(table_id):
         return
     
     # Update game state
-    game_state['state'] = 'classification'
-    game_state['timer'] = timer_config['classification']  # 7 seconds for classification decisions
-    game_state['chat_enabled'] = False  # Disable chat during gameplay
-    
-    # Deal cards to players
-    for player in game_state['players']:
-        player['cards'] = deal_cards(game_state['deck'], 3)
-        player['decisions'] = {'keep': None, 'kill': None, 'kick': None}
-    
-    # Create a new hand
-    with app.app_context():
-        game = Game.query.get(game_state['game_id'])
-        if game:
-            hand = Hand(
-                game_id=game.id,
-                hand_number=1  # First hand
-            )
-            db.session.add(hand)
-            db.session.commit()
-            
-            # Save initial cards for each player
-            for player in game_state['players']:
-                hand_player = HandPlayer(
-                    hand_id=hand.id,
-                    player_id=player['id'],
-                    initial_cards=cards_to_string(player['cards'])
-                )
-                db.session.add(hand_player)
-            
-            db.session.commit()
-            
-            game_state['current_hand'] = hand.id
-        
+    from game import moveGameStateToNext
+    moveGameStateToNext()
     # Start classification timer
-    start_timer('classification', table_id)
+    start_timer('choose_trash', table_id)
     
     # Send updated game state to all players
     socketio.emit('game_state_update', game_state, room=f'table_{table_id}')
