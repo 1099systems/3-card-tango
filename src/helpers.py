@@ -163,7 +163,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     print('batman in process')
     game_state = game_states.get(table_id)
     
-    if not game_state or game_state['state'] not in ['pre_kick_betting', 'post_turn_betting', 'final_betting']:
+    if not game_state or game_state['state'] not in ['ante', 'pre_kick_betting', 'post_turn_betting', 'final_betting']:
         return False
     
     # Find the player
@@ -182,7 +182,6 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         player['last_action'] = 'check'
     
     elif action_type == 'bet':
-        # TODO batman: add to pot even if in anter
         bet_amount = action_data.get('amount', 0)
         
         if bet_amount <= 0 or bet_amount > player['chips']:

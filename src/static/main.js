@@ -12,19 +12,6 @@ async function debugAddPlayer(username) {
 }
 
 function debugNextPhase() {
-    // BATMAN TODO: instead of passing string for states, create test state object with updated data (cards, chips, etc), and pass it!
-    // let newGameState = {
-    //     chatEnabled: true,
-    //     communityCards: [],
-    //     gameId: 1,
-    //     players: [],
-    //     pot: 0,
-    //     selectAction: null,
-    //     selectCard: null,
-    //     state: 'waiting',
-    //     tableId: 1,
-    //     timer: null
-    // };
     let newGameState = gameState;
     switch (gameState.state) {
         case 'waiting':
@@ -128,13 +115,14 @@ async function getPlayerOrCreate(sessionId, username) {
         });
 
         const data = await response.json();
-        player.id = data.id;
-        player.sessionId = data.session_id;
-        player.username = data.username;
-        player.chips = data.chips;
-        player.isPermanent = data.is_permanent;
+        const newPlayer = {};
+        newPlayer.id = data.id;
+        newPlayer.sessionId = data.session_id;
+        newPlayer.username = data.username;
+        newPlayer.chips = data.chips;
+        newPlayer.isPermanent = data.is_permanent;
 
-        return player;
+        return newPlayer;
     } catch (error) {
         console.error('Error getting or creating player data:', error);
     }
@@ -250,9 +238,10 @@ function init() {
 async function fetchPlayerData() {
     try {
         const result = await getPlayerOrCreate(player.sessionId);
+        player = result;
 
         // Save session ID
-        localStorage.setItem('sessionId', result.sessionId);
+        localStorage.setItem('sessionId', player.sessionId);
 
         // Update UI
         updatePlayerInfo();

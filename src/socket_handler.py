@@ -116,6 +116,8 @@ def handle_join_table(data):
         # Check if we should start the game
         if len(game_state['players']) >= 2 and game_state['state'] == 'waiting':
             game_state['state'] = 'ante'
+            game_state['current_player_index'] = 0
+            game_state['current_bet'] = 0
             # game_state['timer'] = 10  # 10 second countdown to start
             # start_timer('start', suitable_table.id)
     
