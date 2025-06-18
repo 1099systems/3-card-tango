@@ -144,6 +144,22 @@ function debugPlaceBet(playerId, amount) {
     processPlaceBet(playerId, amount);
 }
 
+function debugChooseTrash(playerId, index) {
+    processChooseTrash(playerId, index);
+}
+
+function processChooseTrash(sessionId, index) {
+    cardActionsTrash.classList.add('hidden');
+    gameState.selectedCard = index;
+    selectAction(sessionId, 'kill', index);
+}
+
+function processChooseTango(sessionId, index) {
+    cardActionsTango.classList.add('hidden');
+    gameState.selectedCard = index;
+    selectAction(sessionId, 'kick', index);
+}
+
 function updateUI(state) {
     updateGameStatus();
     updatePlayers();
@@ -428,7 +444,7 @@ function selectCard(cardIndex) {
     updatePlayerCards();
 }
 
-function selectAction(action) {
+function selectAction(sessionId, action, card_index) {
     if (gameState.selectedCard === null) {
         alert('Please select a card first');
         return;
@@ -436,11 +452,11 @@ function selectAction(action) {
 
     // Send action to server
     socket.emit('player_action', {
-        session_id: player.sessionId,
+        session_id: sessionId,
         table_id: gameState.tableId,
         action_type: action,
         action_data: {
-            card_index: gameState.selectedCard
+            card_index: card_index
         }
     });
 
@@ -705,38 +721,26 @@ function updateControls() {
 
         // Add event listeners
         document.getElementById('kill-action-1').onclick = () => {
-            alert('removing cardactionsTrash by adding hidden');
-            cardActionsTrash.classList.add('hidden');
-            gameState.selectedCard = 0;
-            selectAction('kill');
+            processChooseTrash(currentPlayer.sessionId, 0);
         };
         document.getElementById('kill-action-2').onclick = () => {
-            alert('removing cardactionsTrash by adding hidden');
-            cardActionsTrash.classList.add('hidden');
-            gameState.selectedCard = 1;
-            selectAction('kill');
+            processChooseTrash(currentPlayer.sessionId, 1);
         };
         document.getElementById('kill-action-3').onclick = () => {
-            alert('removing cardactionsTrash by adding hidden');
-            cardActionsTrash.classList.add('hidden');
-            gameState.selectedCard = 2;
-            selectAction('kill');
+            processChooseTrash(currentPlayer.sessionId, 2);
         };
     } else if (gameState.state === 'choose_tango') {
         cardActionsTango.classList.remove('hidden');
 
         // Add event listeners
         document.getElementById('kick-action-1').onclick = () => {
-            gameState.selectedCard = 0;
-            selectAction('kick');
+            processChooseTango(currentPlayer.sessionId, 0);
         };
         document.getElementById('kick-action-2').onclick = () => {
-            gameState.selectedCard = 1;
-            selectAction('kick');
+            processChooseTango(currentPlayer.sessionId, 1);
         };
         document.getElementById('kick-action-3').onclick = () => {
-            gameState.selectedCard = 2;
-            selectAction('kick');
+            processChooseTango(currentPlayer.sessionId, 2);
         };
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
         checkBtn.classList.remove('hidden');
