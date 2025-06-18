@@ -701,16 +701,19 @@ function updateControls() {
 
         // Add event listeners
         document.getElementById('kill-action-1').onclick = () => {
+            alert('removing cardactionsTrash by adding hidden');
             cardActionsTrash.classList.add('hidden');
             gameState.selectedCard = 0;
             selectAction('kill');
         };
         document.getElementById('kill-action-2').onclick = () => {
+            alert('removing cardactionsTrash by adding hidden');
             cardActionsTrash.classList.add('hidden');
             gameState.selectedCard = 1;
             selectAction('kill');
         };
         document.getElementById('kill-action-3').onclick = () => {
+            alert('removing cardactionsTrash by adding hidden');
             cardActionsTrash.classList.add('hidden');
             gameState.selectedCard = 2;
             selectAction('kill');

@@ -141,7 +141,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     # Find the player
     player_index = next((i for i, p in enumerate(game_state['players']) if p['id'] == player_id), None)
     
-    if game_state['state'] not in ['ante'] and player_index is None or player_index != game_state['current_player_index']:
+    if game_state['state'] not in ['ante'] and (player_index is None or player_index != game_state['current_player_index']):
         return False
     
     player = game_state['players'][player_index]
