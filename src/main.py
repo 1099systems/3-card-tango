@@ -17,10 +17,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 timer_config = {
     'card_draw': 10,
-    'choose_trash': 7,
-    'choose_tango': 7,
-    'betting': 7,
-    'next_player': 7,
+    'choose_trash': 120,
+    'choose_tango': 120,
+    'betting': 120,
+    'next_player': 120,
     'next_hand': 10,
 }
 

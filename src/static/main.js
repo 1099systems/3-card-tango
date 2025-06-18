@@ -445,7 +445,13 @@ function selectAction(action) {
     });
 
     // Reset selection
-    gameState.selectedCard = null;
+    if (currentPlayer && gameState.selectedCard) {
+        currentPlayer.cards = currentPlayer.cards.filter(
+            card => card !== gameState.selectedCard
+        );
+        gameState.selectedCard = null;
+    }
+    // updatePlayerCards();
 }
 
 function placeBet() {

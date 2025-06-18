@@ -99,8 +99,15 @@ def process_classification_action(player_id, table_id, action_type, action_data)
             ).first()
             
             if hand_player:
-                hand_player.killed_card = card_to_string(player['cards'][player['decisions']['kill']])
-                hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
+                    # Convert the killed card index to string and assign it
+                killed_index = player['decisions']['kill']
+                killed_card = player['cards'][killed_index]
+                hand_player.killed_card = card_to_string(killed_card)
+                # TODO:
+                # hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
+                # Remove the killed card from the player's cards
+                # TODO: make it current player
+                game_state['players'][0]['cards'].pop(killed_index)
                 db.session.commit()
 
     # Check if all players have made all decisions
