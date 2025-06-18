@@ -14,7 +14,7 @@ def start_timer(phase, table_id):
 
     if phase == 'card_draw':
         socketio.start_background_task(countdown_to_start, table_id)
-    elif phase == 'choose_trash':
+    elif phase == 'choose_trash' or phase == 'choose_tango':
         socketio.start_background_task(classification_timer, table_id)
     elif phase == 'betting':
         socketio.start_background_task(betting_timer, table_id)
