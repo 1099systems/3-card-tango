@@ -691,13 +691,17 @@ function updateControls() {
     betBtn.classList.add('hidden');
     foldBtn.classList.add('hidden');
 
+    const currentPlayer = gameState.players.find(p => p.id === player.id);
+
     // Show appropriate controls based on game state
     if (gameState.state == 'ante') {
         betBtn.classList.remove('hidden');
         document.getElementById('bet-btn').onclick = placeBet;
     }
     if (gameState.state === 'choose_trash') {
-        cardActionsTrash.classList.remove('hidden');
+        if (currentPlayer.decisions.kill == null) {
+            cardActionsTrash.classList.remove('hidden');
+        }
 
         // Add event listeners
         document.getElementById('kill-action-1').onclick = () => {
