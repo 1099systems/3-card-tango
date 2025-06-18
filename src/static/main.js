@@ -140,6 +140,10 @@ function debugUpdateGameState(state) {
     updateUI(state);
 }
 
+function debugPlaceBet(playerId, amount) {
+    processPlaceBet(playerId, amount);
+}
+
 function updateUI(state) {
     updateGameStatus();
     updatePlayers();
@@ -458,15 +462,19 @@ function placeBet() {
         return;
     }
 
-    // Send action to server
+    processPlaceBet(player.sessionId, amount);
+}
+
+function processPlaceBet(playerId, amount) {
     socket.emit('player_action', {
-        session_id: player.sessionId,
+        session_id: playerId,
         table_id: gameState.tableId,
         action_type: 'bet',
         action_data: {
             amount: amount
         }
     });
+
 }
 
 function check() {
