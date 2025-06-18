@@ -445,13 +445,9 @@ function selectAction(action) {
     });
 
     // Reset selection
-    if (currentPlayer && gameState.selectedCard) {
-        currentPlayer.cards = currentPlayer.cards.filter(
-            card => card !== gameState.selectedCard
-        );
+    if (gameState.selectedCard) {
         gameState.selectedCard = null;
     }
-    // updatePlayerCards();
 }
 
 function placeBet() {
@@ -663,16 +659,16 @@ function updatePlayerCards() {
             console.log('adding card ' + card);
             const cardElement = createCardElement(card);
 
-            // Add selected class if this card is selected
-            if (gameState.selectedCard === index) {
-                cardElement.style.transform = 'translateY(-20px)';
-                cardElement.style.boxShadow = '0 0 20px rgba(5, 217, 232, 0.7)';
-            }
+            // // Add selected class if this card is selected
+            // if (gameState.selectedCard === index) {
+            //     cardElement.style.transform = 'translateY(-20px)';
+            //     cardElement.style.boxShadow = '0 0 20px rgba(5, 217, 232, 0.7)';
+            // }
 
-            // Add click event
-            cardElement.addEventListener('click', () => {
-                selectCard(index);
-            });
+            // // Add click event
+            // cardElement.addEventListener('click', () => {
+            //     selectCard(index);
+            // });
 
             playerCardsElement.appendChild(cardElement);
             console.log('added   card ' + card);

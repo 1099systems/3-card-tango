@@ -428,7 +428,7 @@ h6,
 }
 
 .playing-card:hover {
-    transform: translateY(-10px);
+    /* transform: translateY(-10px); */
     box-shadow:
         0 0 15px rgba(0, 0, 0, 0.7),
         0 0 30px rgba(5, 217, 232, 0.5);

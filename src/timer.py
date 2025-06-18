@@ -82,7 +82,7 @@ def classification_timer(table_id):
                     if hand_player:
                         hand_player.kept_card = card_to_string(player['cards'][player['decisions']['keep']])
                         hand_player.killed_card = card_to_string(player['cards'][player['decisions']['kill']])
-                        hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
+                        # hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
                         db.session.commit()
 
     from game import moveGameStateToNext
