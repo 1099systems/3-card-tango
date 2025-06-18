@@ -721,26 +721,26 @@ function updateControls() {
 
         // Add event listeners
         document.getElementById('kill-action-1').onclick = () => {
-            processChooseTrash(currentPlayer.sessionId, 0);
+            processChooseTrash(player.sessionId, 0);
         };
         document.getElementById('kill-action-2').onclick = () => {
-            processChooseTrash(currentPlayer.sessionId, 1);
+            processChooseTrash(player.sessionId, 1);
         };
         document.getElementById('kill-action-3').onclick = () => {
-            processChooseTrash(currentPlayer.sessionId, 2);
+            processChooseTrash(player.sessionId, 2);
         };
     } else if (gameState.state === 'choose_tango') {
         cardActionsTango.classList.remove('hidden');
 
         // Add event listeners
         document.getElementById('kick-action-1').onclick = () => {
-            processChooseTango(currentPlayer.sessionId, 0);
+            processChooseTango(player.sessionId, 0);
         };
         document.getElementById('kick-action-2').onclick = () => {
-            processChooseTango(currentPlayer.sessionId, 1);
+            processChooseTango(player.sessionId, 1);
         };
         document.getElementById('kick-action-3').onclick = () => {
-            processChooseTango(currentPlayer.sessionId, 2);
+            processChooseTango(player.sessionId, 2);
         };
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
         checkBtn.classList.remove('hidden');
