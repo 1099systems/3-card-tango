@@ -116,7 +116,7 @@ def handle_join_table(data):
         # Check if we should start the game
         if len(game_state['players']) >= 2 and game_state['state'] == 'waiting':
             from game import moveGameStateToNext
-            moveGameStateToNext(game_state)
+            moveGameStateToNext(game_state, suitable_table.id)
     
     # Send updated game state to all players at the table
     # NOTE: game_states here can be empty if the server restarted

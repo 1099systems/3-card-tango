@@ -5,28 +5,28 @@ from src.models.models import Table, Game, GamePlayer, Hand, HandPlayer
 from src.models import db
 
 def start_timer(phase, table_id):
-    timer_disabled = os.getenv('DEBUG_DISABLE_TIMER')
+    timer_disabled = os.getenv('DEBUG_DISABLE_TIMER', 'false').lower() == 'true'
+
     if timer_disabled:
         print('Timer is disabled. Please continue the game using manual console commands.')
         return
     print('Starting timer...')
 
-    if phase == 'choose_trash':
+    if phase == 'card_draw':
         socketio.start_background_task(countdown_to_start, table_id)
+    elif phase == 'choose_trash':
+        socketio.start_background_task(classification_timer, table_id)
     elif phase == 'betting':
         socketio.start_background_task(betting_timer, table_id)
     elif phase == 'next_hand':
         socketio.start_background_task(next_hand_timer, table_id)
-    elif phase == 'classification':
-        socketio.start_background_task(classification_timer, table_id)
-
 
 def countdown_to_start(table_id):
     """Countdown to start the game, starting with choose_trash."""
     table_id = int(table_id)
     game_state = game_states.get(table_id)
     
-    if not game_state or game_state['state'] != 'starting':
+    if not game_state or game_state['state'] != 'card_draw':
         return
     
     while game_state['timer'] > 0:
@@ -43,7 +43,7 @@ def classification_timer(table_id):
     table_id = int(table_id)
     game_state = game_states.get(table_id)
     
-    if not game_state or game_state['state'] != 'classification':
+    if not game_state or game_state['state'] not in ['choose_trash', 'choose_tango']:
         return
     
     while game_state['timer'] > 0:
@@ -84,15 +84,9 @@ def classification_timer(table_id):
                         hand_player.killed_card = card_to_string(player['cards'][player['decisions']['kill']])
                         hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
                         db.session.commit()
-    
-    # Move to pre-kick betting
-    game_state['state'] = 'pre_kick_betting'
-    game_state['timer'] = timer_config['betting']  # 7 seconds for betting
-    game_state['current_bet'] = 0
-    game_state['current_player_index'] = 0
-    
-    # Start betting timer
-    socketio.start_background_task(betting_timer, table_id)
+
+    from game import moveGameStateToNext
+    moveGameStateToNext(game_state, table_id)
     
     # Send updated game state to all players
     socketio.emit('game_state_update', game_state, room=f'table_{table_id}')

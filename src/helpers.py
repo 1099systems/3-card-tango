@@ -55,7 +55,8 @@ def start_game(table_id):
     
     # Update game state
     from game import moveGameStateToNext
-    moveGameStateToNext()
+    moveGameStateToNext(game_state, table_id)
+    
     # Start classification timer
     start_timer('choose_trash', table_id)
     
@@ -132,7 +133,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     # Find the player
     player_index = next((i for i, p in enumerate(game_state['players']) if p['id'] == player_id), None)
     
-    if player_index is None or player_index != game_state['current_player_index']:
+    if game_state['state'] not in ['ante'] and player_index is None or player_index != game_state['current_player_index']:
         return False
     
     player = game_state['players'][player_index]
@@ -150,7 +151,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         if bet_amount <= 0 or bet_amount > player['chips']:
             return False
         
-        if game_state['current_bet'] > 0 and bet_amount < game_state['current_bet']:
+        if game_state['state'] not in ['ante'] and game_state['current_bet'] > 0 and bet_amount < game_state['current_bet']:
             return False  # Bet must be at least the current bet
         
         player['chips'] -= bet_amount
@@ -180,85 +181,94 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     
     # Check if betting round is complete
     try:
-        if next_player_index == game_state['current_player_index'] or all(
+        if game_state['state'] == 'ante' and all(
             'last_action' in p and (
-                p['last_action'] in ['check', 'fold'] or
-                (p['last_action'].startswith('bet') and int(p['last_action'].split()[1]) == game_state['current_bet'])
+                p['last_action'].startswith('bet')
             )
             for p in active_players
         ):
-            # Move to next phase
-            if game_state['state'] == 'pre_kick_betting':
-                # Move to turn draw
-                game_state['state'] = 'turn_draw'
+            from game import moveGameStateToNext
+            moveGameStateToNext(game_state, table_id)
+        else:
+            if next_player_index == game_state['current_player_index'] or all(
+                'last_action' in p and (
+                    p['last_action'] in ['check', 'fold'] or
+                    (p['last_action'].startswith('bet') and int(p['last_action'].split()[1]) == game_state['current_bet'])
+                )
+                for p in active_players
+            ):
+                # Move to next phase
+                if game_state['state'] == 'pre_kick_betting':
+                    # Move to turn draw
+                    game_state['state'] = 'turn_draw'
+                    
+                    # Deal turn card to each active player
+                    for player in active_players:
+                        player['turn_card'] = deal_cards(game_state['deck'], 1)[0]
+                        
+                        # Update database
+                        with app.app_context():
+                            hand = Hand.query.get(game_state['current_hand'])
+                            if hand:
+                                hand_player = HandPlayer.query.filter_by(
+                                    hand_id=hand.id,
+                                    player_id=player['id']
+                                ).first()
+                                
+                                if hand_player:
+                                    hand_player.turn_card = card_to_string(player['turn_card'])
+                                    db.session.commit()
+                    
+                    # Move to post-turn betting
+                    game_state['state'] = 'post_turn_betting'
+                    game_state['timer'] = timer_config['betting']  # 7 seconds for betting
+                    game_state['current_bet'] = 0
+                    game_state['current_player_index'] = 0
+                    
+                    # Start betting timer
+                    start_timer('betting', table_id)
                 
-                # Deal turn card to each active player
-                for player in active_players:
-                    player['turn_card'] = deal_cards(game_state['deck'], 1)[0]
+                elif game_state['state'] == 'post_turn_betting':
+                    # Move to board reveal
+                    game_state['state'] = 'board_reveal'
+                    
+                    # Collect kicked cards from all players
+                    kicked_cards = []
+                    for player in game_state['players']:
+                        if 'decisions' in player and player['decisions']['kick'] is not None:
+                            kicked_cards.append(player['cards'][player['decisions']['kick']])
+                    
+                    # Add dealer cards if needed
+                    num_players = len(game_state['players'])
+                    dealer_cards_needed = 5 - num_players
+                    dealer_cards = deal_cards(game_state['deck'], dealer_cards_needed) if dealer_cards_needed > 0 else []
+                    
+                    game_state['community_cards'] = kicked_cards + dealer_cards
                     
                     # Update database
                     with app.app_context():
                         hand = Hand.query.get(game_state['current_hand'])
                         if hand:
-                            hand_player = HandPlayer.query.filter_by(
-                                hand_id=hand.id,
-                                player_id=player['id']
-                            ).first()
-                            
-                            if hand_player:
-                                hand_player.turn_card = card_to_string(player['turn_card'])
-                                db.session.commit()
+                            hand.community_cards = cards_to_string(kicked_cards)
+                            hand.dealer_cards = cards_to_string(dealer_cards)
+                            db.session.commit()
+                    
+                    # Move to final betting
+                    game_state['state'] = 'final_betting'
+                    game_state['timer'] = timer_config['betting']  # 7 seconds for betting
+                    game_state['current_bet'] = 0
+                    game_state['current_player_index'] = 0
+                    
+                    # Start betting timer
+                    start_timer('betting', table_id)
                 
-                # Move to post-turn betting
-                game_state['state'] = 'post_turn_betting'
-                game_state['timer'] = timer_config['betting']  # 7 seconds for betting
-                game_state['current_bet'] = 0
-                game_state['current_player_index'] = 0
-                
-                # Start betting timer
-                start_timer('betting', table_id)
-            
-            elif game_state['state'] == 'post_turn_betting':
-                # Move to board reveal
-                game_state['state'] = 'board_reveal'
-                
-                # Collect kicked cards from all players
-                kicked_cards = []
-                for player in game_state['players']:
-                    if 'decisions' in player and player['decisions']['kick'] is not None:
-                        kicked_cards.append(player['cards'][player['decisions']['kick']])
-                
-                # Add dealer cards if needed
-                num_players = len(game_state['players'])
-                dealer_cards_needed = 5 - num_players
-                dealer_cards = deal_cards(game_state['deck'], dealer_cards_needed) if dealer_cards_needed > 0 else []
-                
-                game_state['community_cards'] = kicked_cards + dealer_cards
-                
-                # Update database
-                with app.app_context():
-                    hand = Hand.query.get(game_state['current_hand'])
-                    if hand:
-                        hand.community_cards = cards_to_string(kicked_cards)
-                        hand.dealer_cards = cards_to_string(dealer_cards)
-                        db.session.commit()
-                
-                # Move to final betting
-                game_state['state'] = 'final_betting'
-                game_state['timer'] = timer_config['betting']  # 7 seconds for betting
-                game_state['current_bet'] = 0
-                game_state['current_player_index'] = 0
-                
-                # Start betting timer
-                start_timer('betting', table_id)
-            
-            elif game_state['state'] == 'final_betting':
-                # Move to showdown
-                end_hand(table_id)
-        else:
-            # Move to next player
-            game_state['current_player_index'] = next_player_index
-            game_state['timer'] = timer_config['next_player']  # Reset timer for next player
+                elif game_state['state'] == 'final_betting':
+                    # Move to showdown
+                    end_hand(table_id)
+            else:
+                # Move to next player
+                game_state['current_player_index'] = next_player_index
+                game_state['timer'] = timer_config['next_player']  # Reset timer for next player
     except:
         # Move to next player
         game_state['current_player_index'] = next_player_index

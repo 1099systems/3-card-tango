@@ -3,7 +3,8 @@ from card_utils import deal_cards,  cards_to_string
 from src.models.models import Table, Game, GamePlayer, Hand, HandPlayer
 from src.models import db
 
-def moveGameStateToNext(game_state):
+def moveGameStateToNext(game_state, table_id):
+    from timer import start_timer
     if game_state['state'] == 'waiting':
         game_state['state'] = 'ante'
         game_state['current_player_index'] = 0
@@ -42,23 +43,34 @@ def moveGameStateToNext(game_state):
                 db.session.commit()
                 
                 game_state['current_hand'] = hand.id
+
+        start_timer('card_draw', table_id)
     elif game_state['state'] == 'card_draw':
         game_state['state'] = 'choose_trash'
         game_state['timer'] = timer_config['choose_trash']
+        start_timer('choose_trash', table_id)
         game_state['chat_enabled'] = False  # Disable chat during gameplay
     elif game_state['state'] == 'choose_trash':
         game_state['state'] = 'choose_tango'
         game_state['timer'] = timer_config['choose_tango']
+        start_timer('choose_tango', table_id)
     elif game_state['state'] == 'choose_tango':
         game_state['state'] = 'pre_kick_betting'
+        game_state['timer'] = timer_config['betting']
+        game_state['current_player_index'] = 0
+        start_timer('betting', table_id)
     elif game_state['state'] == 'pre_kick_betting':
         game_state['state'] = 'turn_draw'
     elif game_state['state'] == 'turn_draw':
         game_state['state'] = 'post_turn_betting'
+        game_state['timer'] = timer_config['betting']
+        game_state['current_player_index'] = 0
     elif game_state['state'] == 'post_turn_betting':
         game_state['state'] = 'board_reveal'
     elif game_state['state'] == 'board_reveal':
         game_state['state'] = 'final_betting'
+        game_state['timer'] = timer_config['betting']
+        game_state['current_player_index'] = 0
     elif game_state['state'] == 'final_betting':
         game_state['state'] = 'showdown'
     elif game_state['state'] == 'showdown':
