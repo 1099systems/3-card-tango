@@ -201,7 +201,7 @@ def handle_player_action(data):
     action_type = data.get('action_type')
     action_data = data.get('action_data', {})
 
-    player_action_string = 'Player ' + session_id + ' made action ' + action_type + ' with ' + action_data
+    player_action_string = 'Player ' + session_id + ' made action ' + action_type + ' with ' + str(action_data)
     print(player_action_string)
 
     
