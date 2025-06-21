@@ -733,28 +733,15 @@ function updateControls() {
         }
 
         // Add event listeners
-        document.getElementById('kill-action-1').onclick = () => {
-            processChooseTrash(player.sessionId, 0);
-        };
-        document.getElementById('kill-action-2').onclick = () => {
-            processChooseTrash(player.sessionId, 1);
-        };
-        document.getElementById('kill-action-3').onclick = () => {
-            processChooseTrash(player.sessionId, 2);
-        };
+        document.getElementById('kill-action-1')?.addEventListener('click', () => processChooseTrash(player.sessionId, 0));
+        document.getElementById('kill-action-2')?.addEventListener('click', () => processChooseTrash(player.sessionId, 1));
+        document.getElementById('kill-action-3')?.addEventListener('click', () => processChooseTrash(player.sessionId, 2));
     } else if (gameState.state === 'choose_tango') {
         cardActionsTango.classList.remove('hidden');
+        document.getElementById('kick-action-1')?.addEventListener('click', () => processChooseTango(player.sessionId, 0));
+        document.getElementById('kick-action-2')?.addEventListener('click', () => processChooseTango(player.sessionId, 1));
+        document.getElementById('kick-action-3')?.addEventListener('click', () => processChooseTango(player.sessionId, 2));
 
-        // Add event listeners
-        document.getElementById('kick-action-1').onclick = () => {
-            processChooseTango(player.sessionId, 0);
-        };
-        document.getElementById('kick-action-2').onclick = () => {
-            processChooseTango(player.sessionId, 1);
-        };
-        document.getElementById('kick-action-3').onclick = () => {
-            processChooseTango(player.sessionId, 2);
-        };
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
         checkBtn.classList.remove('hidden');
         betBtn.classList.remove('hidden');
