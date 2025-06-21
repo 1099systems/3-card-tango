@@ -11,6 +11,18 @@ def index():
     """Serve the main page."""
     return render_template('index.html')
 
+
+@app.route('/api/next-state', methods=['POST'])
+def next_game_state():
+    data = request.json
+    game_state = data.get('game_state')
+    table_id = data.get('table_id')
+    from game import moveGameStateToNext
+    moveGameStateToNext(game_state, table_id)
+    return jsonify({
+        'game_state': game_state,
+    })
+
 @app.route('/api/player', methods=['POST'])
 def get_player_in_session_or_create():
     """Create a new player or retrieve existing player by session ID."""

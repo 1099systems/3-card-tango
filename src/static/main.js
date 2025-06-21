@@ -13,93 +13,97 @@ async function debugAddPlayer(username) {
 
 function debugNextPhase() {
     let newGameState = gameState;
-    switch (gameState.state) {
-        case 'waiting':
-            newGameState.state = 'ante';
-            debugUpdateGameState(newGameState);
-            break;
-        case 'ante':
-            newGameState.state = 'card_draw';
+    // switch (gameState.state) {
+    //     case 'waiting':
+    //         newGameState.state = 'ante';
+    //         break;
+    //     case 'ante':
+    //         newGameState.state = 'card_draw';
             
-            newGameState.chat_enabled = false;
-            // countdown timer starts here
-            newGameState.players.forEach((player) => {
-                player['cards'] = [
-                    {
-                        'rank': '6',
-                        'suit': 'clubs'
-                    },
-                    {
-                        'rank': 'A',
-                        'suit': 'diamonds'
-                    },
-                    {
-                        'rank': 'J',
-                        'suit': 'clubs'
-                    },
-                ]
-                player['decisions'] = {
-                    'keep': null, // 0
-                    'kick': null, // 2
-                    'kill': null // 1
-                }
-                player['last_action'] = 'check'
-                player['chips'] = 100
+    //         newGameState.chat_enabled = false;
+    //         // countdown timer starts here
+    //         newGameState.players.forEach((player) => {
+    //             player['cards'] = [
+    //                 {
+    //                     'rank': '6',
+    //                     'suit': 'clubs'
+    //                 },
+    //                 {
+    //                     'rank': 'A',
+    //                     'suit': 'diamonds'
+    //                 },
+    //                 {
+    //                     'rank': 'J',
+    //                     'suit': 'clubs'
+    //                 },
+    //             ]
+    //             player['decisions'] = {
+    //                 'keep': null, // 0
+    //                 'kick': null, // 2
+    //                 'kill': null // 1
+    //             }
+    //             player['last_action'] = 'check'
+    //             player['chips'] = 100
                 
-            });
+    //         });
             
-            newGameState.current_hand = 0;
-            debugUpdateGameState(newGameState);
-            break;
-        case 'card_draw':
-            newGameState.state = 'choose_trash';
-            debugUpdateGameState(newGameState);
-            break;
-        case 'choose_trash':
-            newGameState.state = 'choose_tango';
-            newGameState.current_bet = ''
-            newGameState.current_player_index = ''
-            debugUpdateGameState(newGameState);
-            break;
-        case 'choose_tango':
-            newGameState.state = 'pre_kick_betting';
-            newGameState.current_bet = ''
-            newGameState.current_player_index = ''
-            debugUpdateGameState(newGameState);
-            break;
-        case 'pre_kick_betting':
-            // TODO: player bets, decrease player['chips'], increate gamestate['pot']
-            newGameState.state = 'turn_draw';
-            // new card drawn
-            debugUpdateGameState(newGameState);
-            break;
-        case 'turn_draw':
-            newGameState.state = 'post_turn_betting';
-            debugUpdateGameState(newGameState);
-            break;
-        case 'post_turn_betting':
-            newGameState.state = 'board_reveal';
-            debugUpdateGameState(newGameState);
-            break;
-        case 'board_reveal':
-            newGameState.state = 'final_betting';
-            debugUpdateGameState(newGameState);
-            break;
-        case 'final_betting':
-            newGameState.state = 'showdown';
-            debugUpdateGameState(newGameState);
-            break;
-        case 'showdown':
-            newGameState.state = 'end';
-            debugUpdateGameState(newGameState);
-            break;
-        case 'end':
-            newGameState.state = 'next_game_countdown';
-            debugUpdateGameState(newGameState);
-            break;
-        default:
-            statusText = gameState.state;
-    }
+    //         newGameState.current_hand = 0;
+    //         break;
+    //     case 'card_draw':
+    //         newGameState.state = 'choose_trash';
+    //         break;
+    //     case 'choose_trash':
+    //         newGameState.state = 'choose_tango';
+    //         newGameState.current_bet = ''
+    //         newGameState.current_player_index = ''
+    //         break;
+    //     case 'choose_tango':
+    //         newGameState.state = 'pre_kick_betting';
+    //         newGameState.current_bet = ''
+    //         newGameState.current_player_index = ''
+    //         break;
+    //     case 'pre_kick_betting':
+    //         // TODO: player bets, decrease player['chips'], increate gamestate['pot']
+    //         newGameState.state = 'turn_draw';
+    //         // new card drawn
+    //         break;
+    //     case 'turn_draw':
+    //         newGameState.state = 'post_turn_betting';
+    //         break;
+    //     case 'post_turn_betting':
+    //         newGameState.state = 'board_reveal';
+    //         break;
+    //     case 'board_reveal':
+    //         newGameState.state = 'final_betting';
+    //         break;
+    //     case 'final_betting':
+    //         newGameState.state = 'showdown';
+    //         break;
+    //     case 'showdown':
+    //         newGameState.state = 'end';
+    //         break;
+    //     case 'end':
+    //         newGameState.state = 'next_game_countdown';
+    //         break;
+    //     default:
+    //         statusText = gameState.state;
+    // }
+
+    fetch('/api/next-state', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            game_state: gameState,
+            table_id: gameState.tableId
+        })
+    }).then(async (response) => {
+        const data = await response.json();
+        console.log(data);
+        newGameState = data.game_state
+        debugUpdateGameState(newGameState);
+    });
 }
 
 async function getPlayerOrCreate(sessionId, username) {
