@@ -615,6 +615,9 @@ function updatePlayers() {
     for (let i = 0; i < 5; i++) {
         const position = document.getElementById(`position-${i}`);
         position.style.visibility = 'hidden';
+
+        const cardsElement = position.querySelector('.player-cards');
+        cardsElement.innerHTML = ''; // Clear any previous cards
     }
 
     // Add players
@@ -624,6 +627,8 @@ function updatePlayers() {
 
         const nameElement = position.querySelector('.player-name');
         const chipsElement = position.querySelector('.player-chips');
+        const playerCardsElement = position.querySelector('.player-cards');
+
 
         nameElement.textContent = player.username || `Player ${player.id}`;
         chipsElement.textContent = player.chips + ' chips';
@@ -631,6 +636,24 @@ function updatePlayers() {
         // Add status indicator if folded
         if (player.status === 'folded') {
             nameElement.textContent += ' (Folded)';
+        }
+
+
+        if (player.cards) {
+            // Add player cards
+            console.log('adding cards for ' + player);
+            player.cards.forEach((card, index) => {
+                const cardElement = createBackFacingCardElement();
+
+                playerCardsElement.appendChild(cardElement);
+            });
+            console.log('added cards!');
+
+            // Add turn card if available
+            if (player.turn_card) {
+                const turnCard = createBackFacingCardElement();
+                playerCardsElement.appendChild(turnCard);
+            }
         }
     });
 }
@@ -665,29 +688,15 @@ function updatePlayerCards() {
     playerCardsElement.innerHTML = '';
 
     // Find current player
-
     const currentPlayer = gameState.players.find(p => p.id === player.id);
 
     if (currentPlayer && currentPlayer.cards) {
         // Add player cards
         console.log('adding player cards for ' + currentPlayer);
         currentPlayer.cards.forEach((card, index) => {
-            console.log('adding card ' + card);
             const cardElement = createCardElement(card);
 
-            // // Add selected class if this card is selected
-            // if (gameState.selectedCard === index) {
-            //     cardElement.style.transform = 'translateY(-20px)';
-            //     cardElement.style.boxShadow = '0 0 20px rgba(5, 217, 232, 0.7)';
-            // }
-
-            // // Add click event
-            // cardElement.addEventListener('click', () => {
-            //     selectCard(index);
-            // });
-
             playerCardsElement.appendChild(cardElement);
-            console.log('added   card ' + card);
         });
         console.log('added player cards!');
 
@@ -855,6 +864,14 @@ function createCardElement(card) {
 
     return cardElement;
 }
+
+
+function createBackFacingCardElement() {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'card-placeholder';
+    return placeholder;
+}
+
 
 function getSuitSymbol(suit) {
     switch (suit) {
