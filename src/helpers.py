@@ -65,7 +65,7 @@ def start_game(table_id):
     socketio.emit('game_started', {}, room=f'table_{table_id}')
 
 def process_classification_action(player_id, table_id, action_type, action_data):
-    print('batman in process')
+    print('processing player action')
     """Process a classification action (keep/kill/kick)."""
     game_state = game_states.get(table_id)
     
@@ -116,9 +116,11 @@ def process_classification_action(player_id, table_id, action_type, action_data)
     for p in game_state['players']:
         if None in [p['decisions']['kill'], p['decisions']['kick']]:
             all_decisions_made = False
+            print('all decisions not yet made. continuing for all players to make a decision...')
             break
     
     if all_decisions_made:
+        print('all decisions have been made!')
         # Move to pre-kick betting
         game_state['state'] = 'pre_kick_betting'
         game_state['timer'] = timer_config['betting']  # 7 seconds for betting
@@ -132,7 +134,7 @@ def process_classification_action(player_id, table_id, action_type, action_data)
 
 def process_betting_action(player_id, table_id, action_type, action_data):
     """Process a betting action (check/bet/fold)."""
-    print('batman in process')
+    print('processing player betting')
     game_state = game_states.get(table_id)
     
     if not game_state or game_state['state'] not in ['ante', 'pre_kick_betting', 'post_turn_betting', 'final_betting']:
