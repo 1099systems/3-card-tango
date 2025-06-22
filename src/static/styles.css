@@ -426,6 +426,38 @@ h6,
         box-shadow 0.3s ease;
 }
 
+/* .playing-card--tango {
+    box-shadow:
+        0 0 10px #00ff00,
+        0 0 20px #00ff00,
+        0 0 30px #00ff00,
+        0 0 40px #00ff00;
+    border: 1px solid #00ff00;
+} */
+
+@keyframes neon-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 10px #00ff00,
+            0 0 20px #00ff00,
+            0 0 30px #00ff00,
+            0 0 40px #00ff00;
+    }
+    50% {
+        box-shadow:
+            0 0 5px #00ff00,
+            0 0 10px #00ff00,
+            0 0 15px #00ff00,
+            0 0 20px #00ff00;
+    }
+}
+
+.playing-card--tango {
+    border: 1px solid #00ff00;
+    animation: neon-pulse 1s infinite;
+}
+
+
 .playing-card:hover {
     /* transform: translateY(-10px); */
     box-shadow:
