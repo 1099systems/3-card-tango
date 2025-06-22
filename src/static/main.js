@@ -409,19 +409,41 @@ function handleGameStarted() {
     addSystemChatMessage('Game started');
 }
 
-function handleTimerUpdate(data) {
-    // Update timer
-    timerElement.textContent = data.timer;
+let displayedTime = 0;
+let lastUpdateTime = Date.now();
+let timerInterval;
 
-    // Make timer pulse when low
-    if (data.timer <= 3) {
-        timerElement.style.color = 'var(--neon-pink)';
-        timerElement.style.textShadow = '0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink)';
-    } else {
-        timerElement.style.color = 'white';
-        timerElement.style.textShadow = '0 0 10px var(--neon-pink)';
-    }
+function handleTimerUpdate(data) {
+    // Record the server time and timestamp of update
+    displayedTime = data.timer;
+    lastUpdateTime = Date.now();
+
+    // Clear old interval if any
+    clearInterval(timerInterval);
+
+    // Start smooth countdown
+    timerInterval = setInterval(() => {
+        const now = Date.now();
+        const elapsed = (now - lastUpdateTime) / 1000;
+        const remaining = Math.max(0, displayedTime - elapsed);
+
+        timerElement.textContent = remaining.toFixed(2);
+
+        // Make timer pulse when low
+        if (remaining <= 3) {
+            timerElement.style.color = 'var(--neon-pink)';
+            timerElement.style.textShadow = '0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink)';
+        } else {
+            timerElement.style.color = 'white';
+            timerElement.style.textShadow = '0 0 10px var(--neon-pink)';
+        }
+
+        if (remaining === 0) {
+            clearInterval(timerInterval);
+        }
+    }, 10); // update every 10ms for smooth 2-decimal countdown
 }
+
 
 function handleChatMessage(message) {
     // Add chat message

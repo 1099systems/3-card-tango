@@ -30,8 +30,8 @@ def countdown_to_start(table_id):
         return
     
     while game_state['timer'] > 0:
-        socketio.sleep(1)
-        game_state['timer'] -= 1
+        socketio.sleep(0.5)
+        game_state['timer'] = round(game_state['timer'] - 0.5, 2)
         socketio.emit('timer_update', {'timer': game_state['timer']}, room=f'table_{table_id}')
     
     # Start the game
