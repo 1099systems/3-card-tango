@@ -759,7 +759,10 @@ function updateControls() {
         document.getElementById('kill-action-2')?.addEventListener('click', () => processChooseTrash(player.sessionId, 1));
         document.getElementById('kill-action-3')?.addEventListener('click', () => processChooseTrash(player.sessionId, 2));
     } else if (gameState.state === 'choose_tango') {
-        cardActionsTango.classList.remove('hidden');
+        if (currentPlayer.decisions.kick == null) {
+            cardActionsTango.classList.remove('hidden');
+        }
+
         document.getElementById('kick-action-1')?.addEventListener('click', () => processChooseTango(player.sessionId, 0));
         document.getElementById('kick-action-2')?.addEventListener('click', () => processChooseTango(player.sessionId, 1));
         document.getElementById('kick-action-3')?.addEventListener('click', () => processChooseTango(player.sessionId, 2));

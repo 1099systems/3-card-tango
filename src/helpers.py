@@ -110,7 +110,7 @@ def process_classification_action(player_id, table_id, action_type, action_data)
                 elif action_type == 'kick':
                     kicked_index = player['decisions']['kick']
                     kicked_card = player['cards'][kicked_index]
-                    kicked_card.is_tango = True
+                    kicked_card['is_tango'] = True
                     db.session.commit()
 
     # Check if all players have made all decisions
