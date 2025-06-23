@@ -108,7 +108,9 @@ def process_classification_action(player_id, table_id, action_type, action_data)
                     player['cards'].pop(killed_index)
                     db.session.commit()
                 elif action_type == 'kick':
-                    hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
+                    kicked_index = player['decisions']['kick']
+                    kicked_card = player['cards'][kicked_index]
+                    kicked_card.is_tango = True
                     db.session.commit()
 
     # Check if all players have made all decisions

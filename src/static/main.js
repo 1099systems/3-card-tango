@@ -837,7 +837,11 @@ function addSystemChatMessage(message) {
 // Helper Functions
 function createCardElement(card) {
     const cardElement = document.createElement('div');
-    cardElement.className = `playing-card ${card.suit}`;
+    if (card.is_tango) {
+        cardElement.className = `playing-card playing-card--tango ${card.suit}`;
+    } else {
+        cardElement.className = `playing-card ${card.suit}`;
+    }
 
     const topLeft = document.createElement('div');
     topLeft.className = 'card-top-left';
