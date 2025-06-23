@@ -152,6 +152,10 @@ function debugChooseTrash(playerId, index) {
     processChooseTrash(playerId, index);
 }
 
+function debugChooseTango(playerId, index) {
+    processChooseTango(playerId, index);
+}
+
 function processChooseTrash(sessionId, index) {
     cardActionsTrash.classList.add('hidden');
     gameState.selectedCard = index;
