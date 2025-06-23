@@ -783,6 +783,20 @@ function updateControls() {
     }
 }
 
+const slider = document.getElementById('bet-slider');
+const numberInput = document.getElementById('bet-amount');
+const betValueDisplay = document.getElementById('bet-value');
+
+function updateBetValue(val) {
+    numberInput.value = val;
+    slider.value = val;
+    betValueDisplay.textContent = val;
+}
+
+slider.addEventListener('input', (e) => updateBetValue(e.target.value));
+numberInput.addEventListener('input', (e) => updateBetValue(e.target.value));
+
+
 function updateChatStatus() {
     chatStatusElement.textContent = gameState.chatEnabled ? 'Enabled' : 'Disabled';
     chatStatusElement.className = gameState.chatEnabled ? 'chat-status' : 'chat-status disabled';

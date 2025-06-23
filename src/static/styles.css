@@ -516,6 +516,25 @@ h6,
     font-size: 1rem;
 }
 
+.bet-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bet-control input[type="range"],
+.bet-control input[type="number"] {
+    width: 80px;
+    background: transparent;
+    color: white;
+    border: 1px solid var(--neon-green);
+    border-radius: 4px;
+    padding: 5px;
+    font-family: "Orbitron", sans-serif;
+    font-size: 1rem;
+}
+
+
 .card-action-options {
     display: flex;
     justify-content: center;

@@ -147,8 +147,13 @@
                 <!-- Player Controls -->
                 <div class="player-controls" id="betting-controls">
                     <button class="btn btn-primary action-btn hidden" id="check-btn">Check</button>
-                    <button class="btn btn-success action-btn hidden" id="bet-btn">Bet</button>
-                    <button class="btn btn-secondary action-btn hidden" id="fold-btn">Fold</button>
+                    <button class="btn btn-primary action-btn hidden" id="fold-btn">Fold</button>
+                    <button class="btn btn-secondary action-btn hidden" id="call-btn">Call (1)</button>
+                    <div class="bet-control hidden" id="bet-control">
+                        <input type="range" id="bet-slider" min="1" max="100" value="1">
+                        <input type="number" id="bet-amount" min="1" max="100" value="1">
+                        <button class="btn btn-success action-btn" id="bet-btn">Bet/Raise (<span id="bet-value">1</span>)</button>
+                    </div>
                 </div>
                 
                 <!-- Chat -->
