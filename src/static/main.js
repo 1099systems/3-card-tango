@@ -196,6 +196,7 @@ const cardActionsTango = document.getElementById('card-actions-tango');
 const checkBtn = document.getElementById('check-btn');
 const foldBtn = document.getElementById('fold-btn');
 const callBtn = document.getElementById('call-btn');
+const betControl = document.getElementById('bet-control');
 const betBtn = document.getElementById('bet-btn');
 const timerElement = document.getElementById('timer');
 const gameStatusElement = document.getElementById('game-status');
@@ -498,7 +499,7 @@ function selectAction(sessionId, action, card_index) {
 }
 
 function placeBet() {
-    const betAmount = prompt('Enter bet amount:', '10');
+    const betAmount = betValue;
 
     if (betAmount === null) {
         return;
@@ -534,6 +535,8 @@ function call() {
 
 
 function processPlaceBet(playerId, amount) {
+    betBtn.classList.add('hidden');
+    betControl.classList.add('hidden');
     socket.emit('player_action', {
         session_id: playerId,
         table_id: gameState.tableId,
@@ -542,7 +545,6 @@ function processPlaceBet(playerId, amount) {
             amount: amount
         }
     });
-
 }
 
 function check() {
@@ -766,11 +768,13 @@ function updateControls() {
     foldBtn.classList.add('hidden');
     callBtn.classList.add('hidden');
     betBtn.classList.add('hidden');
+    betControl.classList.add('hidden');
 
     const currentPlayer = gameState.players.find(p => p.id === player.id);
 
     // Show appropriate controls based on game state
     if (gameState.state == 'ante') {
+        betControl.classList.remove('hidden');
         betBtn.classList.remove('hidden');
         document.getElementById('bet-btn').onclick = placeBet;
     }
@@ -796,11 +800,13 @@ function updateControls() {
         // TODO: instead of index = 0, check if index == betting_player
         if (gameState.current_player_index == 0) {
             checkBtn.classList.remove('hidden');
+            betControl.classList.remove('hidden');
             betBtn.classList.remove('hidden');
             // TODO: rename betBtn to "Bet"
         } else {
             foldBtn.classList.remove('hidden');
             callBtn.classList.remove('hidden');
+            betControl.classList.remove('hidden');
             betBtn.classList.remove('hidden');
             // TODO: rename betBtn to "Raise"
         }
@@ -815,12 +821,14 @@ function updateControls() {
 
 const slider = document.getElementById('bet-slider');
 const numberInput = document.getElementById('bet-amount');
+let betValue = document.getElementById('bet-value');
 const betValueDisplay = document.getElementById('bet-value');
 
 function updateBetValue(val) {
     numberInput.value = val;
     slider.value = val;
-    betValueDisplay.textContent = val;
+    betValue = val;
+    betValueDisplay.textContent = "(" + val + ")";
 }
 
 slider.addEventListener('input', (e) => updateBetValue(e.target.value));
