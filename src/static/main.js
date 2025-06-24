@@ -194,8 +194,9 @@ const claimChipsBtn = document.getElementById('claim-chips-btn');
 const cardActionsTrash = document.getElementById('card-actions-trash');
 const cardActionsTango = document.getElementById('card-actions-tango');
 const checkBtn = document.getElementById('check-btn');
-const betBtn = document.getElementById('bet-btn');
 const foldBtn = document.getElementById('fold-btn');
+const callBtn = document.getElementById('call-btn');
+const betBtn = document.getElementById('bet-btn');
 const timerElement = document.getElementById('timer');
 const gameStatusElement = document.getElementById('game-status');
 const potElement = document.getElementById('pot');
@@ -513,6 +514,25 @@ function placeBet() {
     processPlaceBet(player.sessionId, amount);
 }
 
+
+function call() {
+    const betAmount = gameState.current_bet
+
+    if (betAmount === null) {
+        return;
+    }
+
+    const amount = parseInt(betAmount);
+
+    if (isNaN(amount) || amount <= 0 || amount > player.chips) {
+        alert('Invalid bet amount');
+        return;
+    }
+
+    processPlaceBet(player.sessionId, amount);
+}
+
+
 function processPlaceBet(playerId, amount) {
     socket.emit('player_action', {
         session_id: playerId,
@@ -743,8 +763,9 @@ function updateControls() {
     cardActionsTrash.classList.add('hidden');
     cardActionsTango.classList.add('hidden');
     checkBtn.classList.add('hidden');
-    betBtn.classList.add('hidden');
     foldBtn.classList.add('hidden');
+    callBtn.classList.add('hidden');
+    betBtn.classList.add('hidden');
 
     const currentPlayer = gameState.players.find(p => p.id === player.id);
 
@@ -772,14 +793,23 @@ function updateControls() {
         document.getElementById('kick-action-3')?.addEventListener('click', () => processChooseTango(player.sessionId, 2));
 
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
-        checkBtn.classList.remove('hidden');
-        betBtn.classList.remove('hidden');
-        foldBtn.classList.remove('hidden');
+        // TODO: instead of index = 0, check if index == betting_player
+        if (gameState.current_player_index == 0) {
+            checkBtn.classList.remove('hidden');
+            betBtn.classList.remove('hidden');
+            // TODO: rename betBtn to "Bet"
+        } else {
+            foldBtn.classList.remove('hidden');
+            callBtn.classList.remove('hidden');
+            betBtn.classList.remove('hidden');
+            // TODO: rename betBtn to "Raise"
+        }
 
         // Add event listeners
         document.getElementById('check-btn').onclick = check;
-        document.getElementById('bet-btn').onclick = placeBet;
         document.getElementById('fold-btn').onclick = fold;
+        document.getElementById('call-btn').onclick = call;
+        document.getElementById('bet-btn').onclick = placeBet;
     }
 }
 
