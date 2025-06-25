@@ -151,6 +151,18 @@ function debugChooseTango(playerId, index) {
     processChooseTango(playerId, index);
 }
 
+function debugChooseFold(playerId, index) {
+    processCheck(playerId);
+}
+
+function debugChooseCall(playerId) {
+    processCall(playerId, index);
+}
+
+function debugChooseRaise(playerId, amount) {
+    processPlaceBet(playerId, amount+1);
+}
+
 function processChooseTrash(sessionId, index) {
     cardActionsTrash.classList.add('hidden');
     gameState.selectedCard = index;
@@ -517,6 +529,10 @@ function placeBet() {
 
 
 function call() {
+    processCall(player.sessionId);
+}
+
+function processCall(sessionId) {
     const betAmount = gameState.currentBet
 
     if (betAmount === null) {
@@ -530,7 +546,7 @@ function call() {
         return;
     }
 
-    processPlaceBet(player.sessionId, amount);
+    processPlaceBet(sessionId, amount);
 }
 
 
@@ -548,9 +564,13 @@ function processPlaceBet(playerId, amount) {
 }
 
 function check() {
+    processCheck(player.sessionId);
+}
+
+function processCheck(sessionId) {
     // Send action to server
     socket.emit('player_action', {
-        session_id: player.sessionId,
+        session_id: sessionId,
         table_id: gameState.tableId,
         action_type: 'check',
         action_data: {}
