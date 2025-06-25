@@ -226,6 +226,10 @@ def handle_player_action(data):
         game_state['state'] = 'choose_trash'
     elif action_type == 'kick':
         game_state['state'] = 'choose_tango'
+    
+    # Fix from debug states
+    if action_type == 'bet' and game_state['state'] == 'turn_draw':
+        game_state['state'] = 'post_turn_betting'
 
     # Process action based on game state and action type
     if game_state['state'] == 'choose_trash':
