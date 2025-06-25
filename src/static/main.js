@@ -179,9 +179,7 @@ function updateUI(state) {
     updateGameStatus();
     updatePlayers();
     updatePot();
-    if (state && state.communityCards) {
-        updateCommunityCards(state.communityCards);
-    }
+    updateCommunityCards();
     updatePlayerCards();
     updateControls();
     updateChatStatus();
@@ -402,7 +400,7 @@ function handleGameStateUpdate(state) {
     gameState.currentBet = state.current_bet || 0;
     gameState.communityCards = state.community_cards;
 
-    updateUI(state);
+    updateUI(gameState);
 }
 
 function handlePlayerJoined(playerData) {
@@ -471,7 +469,8 @@ function handleHandResult(result) {
     console.log('Hand result:', result);
 
     // Add chat message
-    addSystemChatMessage(`${result.winner.username || 'Anonymous'} won the pot of ${result.pot_amount} chips!`);
+    alert(`🏆 Player ${result.winner.username || 'Anonymous'} Wins Pot! (${result.pot_amount})`);
+    addSystemChatMessage(`🏆 Player ${result.winner.username || 'Anonymous'} Wins Pot! (${result.pot_amount})`);
 }
 
 function handleError(error) {
@@ -665,7 +664,7 @@ function updateGameStatus() {
             statusText = 'Post-Draw-Card Betting Round';
             break;
         case 'board_reveal':
-            statusText = 'Revealing Community Cards';
+            statusText = 'Community Cards Revealed';
             break;
         case 'final_betting':
             statusText = 'Final Betting Round';
@@ -735,13 +734,14 @@ function updatePot() {
     potElement.textContent = `Pot: ${gameState.pot}`;
 }
 
-function updateCommunityCards(cards) {
+function updateCommunityCards() {
     // Clear community cards
     communityCardsElement.innerHTML = '';
 
+    cards = gameState.communityCards;
+
     // Add community cards
     if (cards && cards.length > 0) {
-        alert('yes revealing!')
         cards.forEach(card => {
             const cardElement = createCardElement(card);
             communityCardsElement.appendChild(cardElement);

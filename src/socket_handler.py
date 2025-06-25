@@ -231,6 +231,10 @@ def handle_player_action(data):
     if action_type == 'bet' and game_state['state'] == 'turn_draw':
         game_state['state'] = 'post_turn_betting'
 
+    # Fix from debug states
+    if action_type == 'bet' and game_state['state'] == 'board_reveal':
+        game_state['state'] = 'final_betting'
+
     # Process action based on game state and action type
     if game_state['state'] == 'choose_trash':
         if action_type in ['kill']:
