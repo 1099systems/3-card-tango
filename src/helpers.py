@@ -153,8 +153,9 @@ def all_players_acted(players):
     return all(
         'last_action' in p and (
             p['last_action'] in ['check', 'fold'] or
-            (p['last_action'].startswith('bet'))
-            # (p['last_action'].startswith('bet') and int(p['last_action'].split()[1]) == current_bet)
+            p['last_action'].startswith('pre_kick_bet') or
+            p['last_action'].startswith('post_turn_bet') or
+            p['last_action'].startswith('final_bet')
         )
         for p in players
     )
@@ -244,13 +245,19 @@ def process_betting_action(player_id, table_id, action_type, action_data):
 
         if game_state['state'] in ['ante']:
             player['last_action'] = f'ante {bet_amount}'
+        elif game_state['state'] in ['pre_kick_betting']:
+            player['last_action'] = f'pre_kick_bet {bet_amount}'
+        elif game_state['state'] in ['post_turn_betting']:
+            player['last_action'] = f'post_turn_bet {bet_amount}'
+        elif game_state['state'] in ['final_betting']:
+            player['last_action'] = f'final_bet {bet_amount}'
         else:
-            player['last_action'] = f'bet {bet_amount}'
+            print('Invalid game state')
+            return False
     
     elif action_type == 'fold':
         player['status'] = 'folded'
         player['last_action'] = 'fold'
-    
     else:
         return False
     

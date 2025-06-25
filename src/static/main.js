@@ -792,6 +792,7 @@ function displayBetControl(display) {
 }
 function updateControls() {
     // Hide all controls
+    console.log('updating controls...')
     cardActionsTrash.classList.add('hidden');
     cardActionsTango.classList.add('hidden');
     checkBtn.classList.add('hidden');
@@ -828,9 +829,20 @@ function updateControls() {
         document.getElementById('kick-action-3')?.addEventListener('click', () => processChooseTango(player.sessionId, 2));
 
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
-        if (!currentPlayer.last_action.includes('ante')) {
-            // Player already made a bet
+        console.log('In a post-ante betting round...')
+
+        if (gameState.state == 'pre_kick_betting' && currentPlayer.last_action.includes('pre_kick_bet')) {
+            console.log('Player already made a bet in this betting round')
             return;
+
+        } else if (gameState.state == 'post_turn_betting' && currentPlayer.last_action.includes('post_turn_bet')) {
+            console.log('Player already made a bet in this betting round')
+            return;
+
+        } else if (gameState.state == 'final_betting' && currentPlayer.last_action.includes('final_bet')) {
+            console.log('Player already made a bet in this betting round')
+            return;
+
         }
 
         displayBetControl(true);

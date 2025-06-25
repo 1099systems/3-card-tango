@@ -131,7 +131,6 @@ def betting_timer(table_id):
         current_player = game_state['players'][game_state['current_player_index']]
         
         # Default to fold if there's a bet, check if no bet
-        # batman dapat dito, iset yung player['last_action'] = 'fold'/'check'
         from helpers import process_betting_action
         if game_state['current_bet'] > 0:
             process_betting_action(current_player['id'], table_id, 'fold', {})

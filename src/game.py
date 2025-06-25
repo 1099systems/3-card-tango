@@ -1,5 +1,5 @@
 from main import  app, timer_config
-from card_utils import deal_cards,  cards_to_string
+from card_utils import deal_cards,  cards_to_string, card_to_string
 from src.models.models import Table, Game, GamePlayer, Hand, HandPlayer
 from src.models import db
 
@@ -74,7 +74,7 @@ def moveGameStateToNext(game_state, table_id):
                         player_id=player['id']
                     ).first()
                     if hand_player:
-                        hand_player.turn_card = cards_to_string(player['turn_card'])
+                        hand_player.turn_card = card_to_string(player['turn_card'])
                         db.session.commit()
         game_state['timer'] = timer_config['turn_draw']
         game_state['current_bet'] = 0
