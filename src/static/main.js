@@ -108,7 +108,7 @@ function debugNextPhase() {
         const data = await response.json();
         console.log(data);
         newGameState = data.game_state
-        debugUpdateGameState(newGameState);
+        handleGameStateUpdate(newGameState);
     });
 }
 
@@ -137,17 +137,6 @@ async function getPlayerOrCreate(sessionId, username) {
     } catch (error) {
         console.error('Error getting or creating player data:', error);
     }
-}
-
-function debugUpdateGameState(state) {
-    // Update game state
-    gameState.state = state.state;
-    gameState.players = state.players || [];
-    gameState.pot = state.pot || 0;
-    gameState.timer = state.timer;
-    gameState.chatEnabled = state.chat_enabled !== false;
-
-    updateUI(state);
 }
 
 function debugPlaceBet(playerId, amount) {
@@ -397,6 +386,8 @@ function handleGameStateUpdate(state) {
     gameState.pot = state.pot || 0;
     gameState.timer = state.timer;
     gameState.chatEnabled = state.chat_enabled !== false;
+    gameState.currentPlayerIndex = state.current_player_index || 0;
+    gameState.currentBet = state.current_bet || 0;
 
     updateUI(state);
 }
@@ -511,6 +502,8 @@ function placeBet() {
     if (betAmount === null) {
         return;
     }
+    console.log('bet value')
+    console.log(betValue)
 
     const amount = parseInt(betAmount);
 
@@ -524,7 +517,7 @@ function placeBet() {
 
 
 function call() {
-    const betAmount = gameState.current_bet
+    const betAmount = gameState.currentBet
 
     if (betAmount === null) {
         return;
@@ -792,6 +785,7 @@ function updateControls() {
     if (gameState.state == 'ante') {
         if (!('last_action' in currentPlayer)) {
             displayBetControl(true);
+            betBtnTxt.innerHTML = 'Bet';
         }
         document.getElementById('bet-btn').onclick = placeBet;
     }
@@ -816,20 +810,22 @@ function updateControls() {
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
         displayBetControl(true);
         // TODO: instead of index = 0, check if index == betting_player
-        if (gameState.current_player_index == 0) {
+        if (gameState.currentPlayerIndex == 0) {
             checkBtn.classList.remove('hidden');
             betBtnTxt.innerHTML = 'Bet';
         } else {
             foldBtn.classList.remove('hidden');
             callBtn.classList.remove('hidden');
             betBtnTxt.innerHTML = 'Raise';
-            callValueDisplay.textContent = "(" + (parseInt(gameState.current_bet)) + ")"
-            betValueDisplay.textContent = "(" + (parseInt(gameState.current_bet) + 1) + ")"
+            callValueDisplay.textContent = "(" + (parseInt(gameState.currentBet)) + ")"
+            betValueDisplay.textContent = "(" + (parseInt(gameState.currentBet) + 1) + ")"
         }
 
         // Add event listeners
         document.getElementById('check-btn').onclick = check;
-        document.getElementById('fold-btn').onclick = fold;
+        // Does fold button need fold, or just check? I think it's similar.
+        document.getElementById('fold-btn').onclick = check;
+        // document.getElementById('fold-btn').onclick = fold;
         document.getElementById('call-btn').onclick = call;
         document.getElementById('bet-btn').onclick = placeBet;
     }
@@ -844,7 +840,7 @@ const callValueDisplay = document.getElementById('call-value');
 function updateBetValue(val) {
     numberInput.value = val;
     slider.value = val;
-    betValue = parseInt(val.textContent);
+    betValue = parseInt(val ?? val.textContent);
     betValueDisplay.textContent = "(" + val + ")";
 }
 
