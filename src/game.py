@@ -87,9 +87,34 @@ def moveGameStateToNext(game_state, table_id):
         start_timer('betting', table_id)
     elif game_state['state'] == 'post_turn_betting':
         game_state['state'] = 'board_reveal'
+
+        # Collect kicked cards
+        kicked_cards = [
+            player['cards'][player['decisions']['kick']]
+            for player in game_state['players']
+            if 'decisions' in player and player['decisions'].get('kick') is not None
+        ]
+
+        num_players = len(game_state['players'])
+        dealer_cards_needed = 5 - num_players
+        dealer_cards = deal_cards(game_state['deck'], dealer_cards_needed) if dealer_cards_needed > 0 else []
+
+        game_state['community_cards'] = kicked_cards + dealer_cards
+
+        # Update DB
+        with app.app_context():
+            hand = Hand.query.get(game_state['current_hand'])
+            if hand:
+                hand.community_cards = cards_to_string(kicked_cards)
+                hand.dealer_cards = cards_to_string(dealer_cards)
+                db.session.commit()
+
+        game_state['timer'] = timer_config['board_reveal']
+        start_timer('board_reveal', table_id)
     elif game_state['state'] == 'board_reveal':
         game_state['state'] = 'final_betting'
         game_state['timer'] = timer_config['betting']
+        game_state['current_bet'] = 0
         game_state['current_player_index'] = 0
         start_timer('betting', table_id)
     elif game_state['state'] == 'final_betting':

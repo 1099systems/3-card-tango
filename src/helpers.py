@@ -149,13 +149,11 @@ def all_players_anteed(players):
         for p in players
     )
 
-def all_players_acted(players):
+def all_players_acted(players, bet_action):
     return all(
         'last_action' in p and (
             p['last_action'] in ['check', 'fold'] or
-            p['last_action'].startswith('pre_kick_bet') or
-            p['last_action'].startswith('post_turn_bet') or
-            p['last_action'].startswith('final_bet')
+            p['last_action'].startswith(bet_action)
         )
         for p in players
     )
@@ -165,35 +163,8 @@ def move_to_turn_draw(game_state, table_id):
     moveGameStateToNext(game_state, table_id)
 
 def move_to_board_reveal(game_state, table_id):
-    game_state['state'] = 'board_reveal'
-
-    # Collect kicked cards
-    kicked_cards = [
-        player['cards'][player['decisions']['kick']]
-        for player in game_state['players']
-        if 'decisions' in player and player['decisions'].get('kick') is not None
-    ]
-
-    num_players = len(game_state['players'])
-    dealer_cards_needed = 5 - num_players
-    dealer_cards = deal_cards(game_state['deck'], dealer_cards_needed) if dealer_cards_needed > 0 else []
-
-    game_state['community_cards'] = kicked_cards + dealer_cards
-
-    # Update DB
-    with app.app_context():
-        hand = Hand.query.get(game_state['current_hand'])
-        if hand:
-            hand.community_cards = cards_to_string(kicked_cards)
-            hand.dealer_cards = cards_to_string(dealer_cards)
-            db.session.commit()
-
-    game_state['state'] = 'final_betting'
-    game_state['timer'] = timer_config['betting']
-    game_state['current_bet'] = 0
-    game_state['current_player_index'] = 0
-    start_timer('betting', table_id)
-
+    from game import moveGameStateToNext
+    moveGameStateToNext(game_state, table_id)
 
 def move_bet_to_next_player(game_state, next_player_index):
     game_state['current_player_index'] = next_player_index
@@ -285,21 +256,21 @@ def process_betting_action(player_id, table_id, action_type, action_data):
                 move_bet_to_next_player(game_state, next_player_index)
 
         elif state == 'pre_kick_betting':
-            if all_players_acted(active_players):
+            if all_players_acted(active_players, 'pre_kick_bet'):
                 move_to_turn_draw(game_state, table_id)
             else:
                 move_bet_to_next_player(game_state, next_player_index)
 
         elif state == 'post_turn_betting':
             # if next_player_index == game_state['current_player_index'] or all_players_acted(active_players, game_state['current_bet']):
-            if all_players_acted(active_players):
+            if all_players_acted(active_players, 'post_turn_bet'):
                 move_to_board_reveal(game_state, table_id)
             else:
                 move_bet_to_next_player(game_state, next_player_index)
 
         elif state == 'final_betting':
             # if next_player_index == game_state['current_player_index'] or all_players_acted(active_players, game_state['current_bet']):
-            if all_players_acted(active_players):
+            if all_players_acted(active_players, 'final_bet'):
                 end_hand(table_id)
             else:
                 move_bet_to_next_player(game_state, next_player_index)

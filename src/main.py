@@ -21,6 +21,7 @@ timer_config = {
     'choose_tango': 120,
     'turn_draw': 10,
     'betting': 120,
+    'board_reveal': 10,
     'next_player': 120,
     'next_hand': 10,
 }
