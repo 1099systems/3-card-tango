@@ -75,12 +75,6 @@ function debugMockGameStates(newGameState) {
         case 'board_reveal':
             newGameState.state = 'final_betting';
             break;
-        case 'final_betting':
-            newGameState.state = 'showdown';
-            break;
-        case 'showdown':
-            newGameState.state = 'end';
-            break;
         case 'end':
             newGameState.state = 'next_game_countdown';
             break;
@@ -398,7 +392,9 @@ function handleGameStateUpdate(state) {
     gameState.chatEnabled = state.chat_enabled !== false;
     gameState.currentPlayerIndex = state.current_player_index || 0;
     gameState.currentBet = state.current_bet || 0;
-    gameState.communityCards = state.community_cards;
+    if (state.community_cards) {
+        gameState.communityCards = state.community_cards;
+    }
 
     updateUI(gameState);
 }
@@ -468,9 +464,11 @@ function handleChatMessage(message) {
 function handleHandResult(result) {
     console.log('Hand result:', result);
 
+    winnerMessage = `🏆 Player ${result.winner.username || 'Anonymous'} Wins Pot! (${result.pot_amount})`;
     // Add chat message
-    alert(`🏆 Player ${result.winner.username || 'Anonymous'} Wins Pot! (${result.pot_amount})`);
-    addSystemChatMessage(`🏆 Player ${result.winner.username || 'Anonymous'} Wins Pot! (${result.pot_amount})`);
+    alert(winnerMessage);
+    addSystemChatMessage(winnerMessage);
+    gameStatusElement.textContent = winnerMessage;
 }
 
 function handleError(error) {
@@ -669,11 +667,7 @@ function updateGameStatus() {
         case 'final_betting':
             statusText = 'Final Betting Round';
             break;
-        case 'showdown':
-            statusText = 'Showdown';
-            break;
         case 'end':
-            statusText = 'Player X Wins Pot! (XYZ)';
             break;
         default:
             statusText = gameState.state;

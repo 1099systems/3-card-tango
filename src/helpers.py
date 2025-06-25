@@ -294,10 +294,7 @@ def get_winner(game_state):
         # Compare hands
         for player in active_players:
             # Combine kept card, turn card, and community cards
-            player['final_hand'] = [
-                player['cards'][player['decisions']['keep']],
-                player['turn_card']
-            ] + game_state['community_cards']
+            player['final_hand'] = player['cards'] + [player['turn_card']] + game_state['community_cards']
             
             # Calculate hand strength (simplified for now)
             player['hand_strength'] = calculate_hand_strength(player['final_hand'])
