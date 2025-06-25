@@ -314,44 +314,8 @@ def end_hand(table_id):
     if not game_state:
         return
     
-    # Determine winner
-    winner = get_winner(game_state)
-    
-    # Award pot to winner
-    winner['chips'] += game_state['pot']
-    
-    # Update database
-    with app.app_context():
-        hand = Hand.query.get(game_state['current_hand'])
-        if hand:
-            hand.end_time = datetime.utcnow()
-            
-            for player in game_state['players']:
-                hand_player = HandPlayer.query.filter_by(
-                    hand_id=hand.id,
-                    player_id=player['id']
-                ).first()
-                
-                if hand_player:
-                    if 'final_hand' in player:
-                        hand_player.final_hand = cards_to_string(player['final_hand'])
-                    
-                    hand_player.is_winner = (player['id'] == winner['id'])
-                    hand_player.bet_amount = player.get('bet_amount', 0)
-                    
-                    # Update player chips in game
-                    game_player = GamePlayer.query.filter_by(
-                        game_id=hand.game_id,
-                        player_id=player['id']
-                    ).first()
-                    
-                    if game_player:
-                        game_player.final_chips = player['chips']
-            
-            db.session.commit()
-        
-    # Update game state
     from game import moveGameStateToNext
+    # Update game state
     moveGameStateToNext(game_state, table_id)
     
 
