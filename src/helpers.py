@@ -283,16 +283,10 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     
     return True
 
-def end_hand(table_id):
-    """End the current hand and determine the winner."""
-    game_state = game_states.get(table_id)
-    
-    if not game_state:
-        return
-    
+def get_winner(game_state):
     # Determine winner
     active_players = [p for p in game_state['players'] if p['status'] == 'active']
-    
+
     if len(active_players) == 1:
         # Only one player left, they win
         winner = active_players[0]
@@ -310,6 +304,18 @@ def end_hand(table_id):
         
         # Find player with highest hand strength
         winner = max(active_players, key=lambda p: p['hand_strength'])
+
+    return winner
+
+def end_hand(table_id):
+    """End the current hand and determine the winner."""
+    game_state = game_states.get(table_id)
+    
+    if not game_state:
+        return
+    
+    # Determine winner
+    winner = get_winner(game_state)
     
     # Award pot to winner
     winner['chips'] += game_state['pot']
@@ -345,27 +351,9 @@ def end_hand(table_id):
             db.session.commit()
         
     # Update game state
-    game_state['state'] = 'end'
-    game_state['winner'] = {
-        'id': winner['id'],
-        'username': winner['username'],
-        'hand_strength': winner.get('hand_strength', 0)
-    }
-    game_state['chat_enabled'] = True  # Re-enable chat
-    game_state['timer'] = timer_config['next_hand']  # 10 seconds before next hand
+    from game import moveGameStateToNext
+    moveGameStateToNext(game_state, table_id)
     
-    # Send hand result to all players
-    socketio.emit('hand_result', {
-        'winner': game_state['winner'],
-        'pot_amount': game_state['pot']
-    }, room=f'table_{table_id}')
-    
-    # Start timer for next hand
-    start_timer('next_hand', table_id)
-
-    # Reset pot
-    game_state['pot'] = 0
-
 
 def calculate_hand_strength(cards):
     """Calculate the strength of a poker hand (simplified version)."""

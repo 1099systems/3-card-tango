@@ -121,5 +121,67 @@ def moveGameStateToNext(game_state, table_id):
         game_state['state'] = 'showdown'
     elif game_state['state'] == 'showdown':
         game_state['state'] = 'end'
+
+        from helpers import get_winner
+        # Determine winner
+        winner = get_winner(game_state)
+        
+        # Award pot to winner
+        winner['chips'] += game_state['pot']
+        
+        # Update database
+        with app.app_context():
+            hand = Hand.query.get(game_state['current_hand'])
+            if hand:
+                from datetime import datetime
+                hand.end_time = datetime.utcnow()
+                
+                for player in game_state['players']:
+                    hand_player = HandPlayer.query.filter_by(
+                        hand_id=hand.id,
+                        player_id=player['id']
+                    ).first()
+                    
+                    if hand_player:
+                        if 'final_hand' in player:
+                            hand_player.final_hand = cards_to_string(player['final_hand'])
+                        
+                        hand_player.is_winner = (player['id'] == winner['id'])
+                        hand_player.bet_amount = player.get('bet_amount', 0)
+                        
+                        # Update player chips in game
+                        game_player = GamePlayer.query.filter_by(
+                            game_id=hand.game_id,
+                            player_id=player['id']
+                        ).first()
+                        
+                        if game_player:
+                            game_player.final_chips = player['chips']
+                
+                db.session.commit()
+            
+
+        game_state['winner'] = {
+            'id': winner['id'],
+            'username': winner['username'],
+            'hand_strength': winner.get('hand_strength', 0)
+        }
+        game_state['chat_enabled'] = True  # Re-enable chat
+        game_state['timer'] = timer_config['next_hand']  # 10 seconds before next hand
+
+
+        # Send hand result to all players
+        from main import  socketio
+        socketio.emit('hand_result', {
+            'winner': game_state['winner'],
+            'pot_amount': game_state['pot']
+        }, room=f'table_{table_id}')
+        
+        # Start timer for next hand
+        start_timer('next_hand', table_id)
+
+        # Reset pot
+        game_state['pot'] = 0
+
     elif game_state['state'] == 'end':
         game_state['state'] = 'next_game_countdown'
