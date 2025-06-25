@@ -180,7 +180,7 @@ function updateUI(state) {
     updatePlayers();
     updatePot();
     if (state && state.communityCards) {
-        updateCommunityCards(state.community_cards);
+        updateCommunityCards(state.communityCards);
     }
     updatePlayerCards();
     updateControls();
@@ -400,6 +400,7 @@ function handleGameStateUpdate(state) {
     gameState.chatEnabled = state.chat_enabled !== false;
     gameState.currentPlayerIndex = state.current_player_index || 0;
     gameState.currentBet = state.current_bet || 0;
+    gameState.communityCards = state.community_cards;
 
     updateUI(state);
 }
@@ -740,6 +741,7 @@ function updateCommunityCards(cards) {
 
     // Add community cards
     if (cards && cards.length > 0) {
+        alert('yes revealing!')
         cards.forEach(card => {
             const cardElement = createCardElement(card);
             communityCardsElement.appendChild(cardElement);
