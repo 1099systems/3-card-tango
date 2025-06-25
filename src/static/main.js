@@ -19,7 +19,7 @@ function debugNextPhase() {
     //         break;
     //     case 'ante':
     //         newGameState.state = 'card_draw';
-            
+
     //         newGameState.chat_enabled = false;
     //         // countdown timer starts here
     //         newGameState.players.forEach((player) => {
@@ -44,9 +44,9 @@ function debugNextPhase() {
     //             }
     //             player['last_action'] = 'check'
     //             player['chips'] = 100
-                
+
     //         });
-            
+
     //         newGameState.current_hand = 0;
     //         break;
     //     case 'card_draw':
@@ -500,14 +500,12 @@ function selectAction(sessionId, action, card_index) {
 
 function placeBet() {
     const betAmount = betValue;
-    alert(betAmount)
 
     if (betAmount === null) {
         return;
     }
 
     const amount = parseInt(betAmount);
-    alert(amount)
 
     if (isNaN(amount) || amount <= 0 || amount > player.chips) {
         alert('Invalid bet amount');
@@ -770,7 +768,7 @@ function displayBetControl(display) {
     }
 
     betControl.classList.add('hidden');
-    betBtn.classList.add9('hidden');
+    betBtn.classList.add('hidden');
 }
 function updateControls() {
     // Hide all controls
@@ -785,7 +783,7 @@ function updateControls() {
 
     // Show appropriate controls based on game state
     if (gameState.state == 'ante') {
-        if (currentPlayer.last_action != null) {
+        if (!('last_action' in currentPlayer)) {
             displayBetControl(true);
         }
         document.getElementById('bet-btn').onclick = placeBet;
