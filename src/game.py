@@ -61,16 +61,37 @@ def moveGameStateToNext(game_state, table_id):
         start_timer('betting', table_id)
     elif game_state['state'] == 'pre_kick_betting':
         game_state['state'] = 'turn_draw'
+        active_players = [p for p in game_state['players'] if p['status'] == 'active']
+        for player in active_players:
+            player['turn_card'] = deal_cards(game_state['deck'], 1)[0]
+
+            # Update DB
+            with app.app_context():
+                hand = Hand.query.get(game_state['current_hand'])
+                if hand:
+                    hand_player = HandPlayer.query.filter_by(
+                        hand_id=hand.id,
+                        player_id=player['id']
+                    ).first()
+                    if hand_player:
+                        hand_player.turn_card = cards_to_string(player['turn_card'])
+                        db.session.commit()
+        game_state['timer'] = timer_config['turn_draw']
+        game_state['current_bet'] = 0
+        game_state['current_player_index'] = 0
+        start_timer('turn_draw', table_id)
     elif game_state['state'] == 'turn_draw':
         game_state['state'] = 'post_turn_betting'
         game_state['timer'] = timer_config['betting']
         game_state['current_player_index'] = 0
+        start_timer('betting', table_id)
     elif game_state['state'] == 'post_turn_betting':
         game_state['state'] = 'board_reveal'
     elif game_state['state'] == 'board_reveal':
         game_state['state'] = 'final_betting'
         game_state['timer'] = timer_config['betting']
         game_state['current_player_index'] = 0
+        start_timer('betting', table_id)
     elif game_state['state'] == 'final_betting':
         game_state['state'] = 'showdown'
     elif game_state['state'] == 'showdown':
