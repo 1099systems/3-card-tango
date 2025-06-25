@@ -808,6 +808,11 @@ function updateControls() {
         document.getElementById('kick-action-3')?.addEventListener('click', () => processChooseTango(player.sessionId, 2));
 
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
+        if (!currentPlayer.last_action.includes('ante')) {
+            // Player already made a bet
+            return;
+        }
+
         displayBetControl(true);
         // TODO: instead of index = 0, check if index == betting_player
         if (gameState.currentPlayerIndex == 0) {

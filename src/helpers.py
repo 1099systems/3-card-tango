@@ -178,7 +178,11 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         player['chips'] -= bet_amount
         game_state['pot'] += bet_amount
         game_state['current_bet'] = bet_amount
-        player['last_action'] = f'bet {bet_amount}'
+
+        if game_state['state'] in ['ante']:
+            player['last_action'] = f'ante {bet_amount}'
+        else:
+            player['last_action'] = f'bet {bet_amount}'
     
     elif action_type == 'fold':
         player['status'] = 'folded'
@@ -204,7 +208,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     try:
         if game_state['state'] == 'ante' and all(
             'last_action' in p and (
-                p['last_action'].startswith('bet')
+                p['last_action'].startswith('ante')
             )
             for p in active_players
         ):
