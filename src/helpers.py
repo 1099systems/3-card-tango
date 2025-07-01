@@ -184,7 +184,7 @@ def any_player_acted(players, bet_action):
     )
 
 def player_is_active(player):
-    if player['status'] not in ['folded']:
+    if player['status'] in ['folded']:
             return False
     
     return True
@@ -267,8 +267,6 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         return False
     
     # Move to next player or next phase
-    # active_players = [p for p in game_state['players'] if p['status'] == 'active']
-    # active_players = [p for p in game_state['players'] if p['status'] not in ['folded']]
     active_players = [p for p in game_state['players'] if player_is_active(p)]
     
     if len(active_players) <= 1:
@@ -279,7 +277,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     # Find next active player
     next_player_index = (player_index + 1) % len(game_state['players'])
     # while game_state['players'][next_player_index]['status'] != 'active':
-    while game_state['players'][next_player_index]['status'] != 'active':
+    while not player_is_active(game_state['players'][next_player_index]):
         next_player_index = (next_player_index + 1) % len(game_state['players'])
     
     # Check if betting round is complete
@@ -322,7 +320,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
 
 def get_winner(game_state):
     # Determine winner
-    active_players = [p for p in game_state['players'] if p['status'] == 'active']
+    active_players = [p for p in game_state['players'] if player_is_active(p)]
 
     if len(active_players) == 1:
         # Only one player left, they win

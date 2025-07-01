@@ -61,7 +61,8 @@ def moveGameStateToNext(game_state, table_id):
         start_timer('betting', table_id)
     elif game_state['state'] == 'pre_kick_betting':
         game_state['state'] = 'turn_draw'
-        active_players = [p for p in game_state['players'] if p['status'] == 'active']
+        from helpers import player_is_active
+        active_players = [p for p in game_state['players'] if player_is_active(p)]
         for player in active_players:
             player['turn_card'] = deal_cards(game_state['deck'], 1)[0]
 
