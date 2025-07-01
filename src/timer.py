@@ -90,16 +90,12 @@ def classification_timer(table_id):
     
     # Auto-decide for players who haven't made all decisions
     for player in game_state['players']:
-        if None in [player['decisions']['keep'], player['decisions']['kill'], player['decisions']['kick']]:
+        if None in [ player['decisions']['kill'], player['decisions']['kick']]:
             # Make random decisions for missing actions
-            remaining_indices = [i for i in range(3) if i not in [
-                player['decisions']['keep'],
+            remaining_indices = [i for i in range(2) if i not in [
                 player['decisions']['kill'],
                 player['decisions']['kick']
             ]]
-            
-            if player['decisions']['keep'] is None and remaining_indices:
-                player['decisions']['keep'] = remaining_indices.pop(0)
             
             if player['decisions']['kill'] is None and remaining_indices:
                 player['decisions']['kill'] = remaining_indices.pop(0)
@@ -117,9 +113,8 @@ def classification_timer(table_id):
                     ).first()
                     
                     if hand_player:
-                        hand_player.kept_card = card_to_string(player['cards'][player['decisions']['keep']])
                         hand_player.killed_card = card_to_string(player['cards'][player['decisions']['kill']])
-                        # hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
+                        hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
                         db.session.commit()
 
     from game import moveGameStateToNext

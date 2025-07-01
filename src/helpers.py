@@ -66,7 +66,7 @@ def start_game(table_id):
 
 def process_classification_action(player_id, table_id, action_type, action_data):
     print('processing player action')
-    """Process a classification action (keep/kill/kick)."""
+    """Process a classification action (kill/kick)."""
     game_state = game_states.get(table_id)
     
     if not game_state or game_state['state'] not in ['choose_trash', 'choose_tango']:
@@ -84,7 +84,7 @@ def process_classification_action(player_id, table_id, action_type, action_data)
         return False
     
     # Set the new decision
-    player.setdefault('decisions', {'keep': None, 'kill': None, 'kick': None})[action_type] = card_index
+    player.setdefault('decisions', {'kill': None, 'kick': None})[action_type] = card_index
     # Debug
     if 'current_hand' not in game_state or game_state['current_hand'] is None:
         game_state['current_hand'] = 0

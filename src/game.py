@@ -18,7 +18,7 @@ def moveGameStateToNext(game_state, table_id):
         # Deal cards to players
         for player in game_state['players']:
             player['cards'] = deal_cards(game_state['deck'], 3)
-            player['decisions'] = {'keep': None, 'kill': None, 'kick': None}
+            player['decisions'] = {'kill': None, 'kick': None}
 
         # Create a new hand
         with app.app_context():
