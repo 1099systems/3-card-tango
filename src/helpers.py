@@ -213,18 +213,18 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     
     # Process action
     if action_type == 'check':
-        if game_state['current_bet'] > 0:
-            return False  # Can't check if there's a bet
-        
+        player['status'] = 'checked'
         player['last_action'] = 'check'
     
     elif action_type == 'bet':
         bet_amount = action_data.get('amount', 0)
         
         if bet_amount <= 0 or bet_amount > player['chips']:
+            print('Invalid bet amount!')
             return False
             
         if not is_betting_allowed_from_game_state(game_state):
+            print('Betting is not allowed.')
             return False
         
         player['chips'] -= bet_amount
@@ -247,6 +247,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         player['status'] = 'folded'
         player['last_action'] = 'fold'
     else:
+        print('Invalid action type.')
         return False
     
     # Move to next player or next phase

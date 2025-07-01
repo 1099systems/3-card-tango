@@ -170,10 +170,12 @@ def betting_timer(table_id):
         
         # Default to fold if there's a bet, check if no bet
         from helpers import process_betting_action
-        if game_state['current_bet'] > 0:
-            process_betting_action(current_player['id'], table_id, 'fold', {})
-        else:
+        # TODO: logic below is not correct
+        not_bet_yet_except_from_ante = True #TODO
+        if not_bet_yet_except_from_ante:
             process_betting_action(current_player['id'], table_id, 'check', {})
+        else:
+            process_betting_action(current_player['id'], table_id, 'fold', {})
     
     # Send updated game state to all players
     socketio.emit('game_state_update', game_state, room=f'table_{table_id}')
