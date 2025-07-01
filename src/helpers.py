@@ -242,6 +242,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         else:
             print('Invalid game state')
             return False
+        player['status'] = f'betted {bet_amount}'
     
     elif action_type == 'fold':
         player['status'] = 'folded'
