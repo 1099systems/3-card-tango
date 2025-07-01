@@ -424,6 +424,9 @@ let lastUpdateTime = Date.now();
 let timerInterval;
 
 function handleTimerUpdate(data) {
+    // Display it incase it is hidden (value 0)
+    timerElement.style.display = 'block';
+
     // Record the server time and timestamp of update
     displayedTime = data.timer;
     lastUpdateTime = Date.now();
@@ -433,6 +436,7 @@ function handleTimerUpdate(data) {
 
     // Start smooth countdown
     timerInterval = setInterval(() => {
+
         const now = Date.now();
         const elapsed = (now - lastUpdateTime) / 1000;
         const remaining = Math.max(0, displayedTime - elapsed);
@@ -450,6 +454,7 @@ function handleTimerUpdate(data) {
 
         if (remaining === 0) {
             clearInterval(timerInterval);
+            timerElement.style.display = 'none'; // Hide the timer
         }
     }, 10); // update every 10ms for smooth 2-decimal countdown
 }

@@ -56,13 +56,6 @@ def start_game(table_id):
     # Update game state
     from game import moveGameStateToNext
     moveGameStateToNext(game_state, table_id)
-    
-    # Start classification timer
-    start_timer('choose_trash', table_id)
-    
-    # Send updated game state to all players
-    socketio.emit('game_state_update', game_state, room=f'table_{table_id}')
-    socketio.emit('game_started', {}, room=f'table_{table_id}')
 
 def process_kill_card(player, hand_player):
     try:

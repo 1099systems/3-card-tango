@@ -5,6 +5,7 @@ from src.models import db
 
 def moveGameStateToNext(game_state, table_id):
     from timer import start_timer
+    old_game_state = game_state['state']
     if game_state['state'] == 'waiting':
         game_state['state'] = 'ante'
         game_state['current_player_index'] = 0
@@ -49,6 +50,10 @@ def moveGameStateToNext(game_state, table_id):
         game_state['state'] = 'choose_trash'
         game_state['timer'] = timer_config['choose_trash']
         start_timer('choose_trash', table_id)
+        from main import  socketio
+        # Send updated game state to all players
+        socketio.emit('game_state_update', game_state, room=f'table_{table_id}')
+        socketio.emit('game_started', {}, room=f'table_{table_id}')
         game_state['chat_enabled'] = False  # Disable chat during gameplay
     elif game_state['state'] == 'choose_trash':
         game_state['state'] = 'choose_tango'
@@ -184,3 +189,5 @@ def moveGameStateToNext(game_state, table_id):
 
     elif game_state['state'] == 'end':
         game_state['state'] = 'next_game_countdown'
+    print('Moved game state from ' + old_game_state + ' to ' + game_state['state'])
+    

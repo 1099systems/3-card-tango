@@ -138,7 +138,7 @@ def classification_timer(table_id):
                             from helpers import process_kick_card
                             process_kick_card(player, hand_player)
     else:
-        print('Invalid game state!')
+        print('Invalid game state: ' + game_state['state'])
         return
     
 
