@@ -183,6 +183,12 @@ def any_player_acted(players, bet_action):
         for p in players
     )
 
+def player_is_active(player):
+    if player['status'] not in ['folded']:
+            return False
+    
+    return True
+
 
 def move_to_turn_draw(game_state, table_id):
     from game import moveGameStateToNext
@@ -261,7 +267,9 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         return False
     
     # Move to next player or next phase
-    active_players = [p for p in game_state['players'] if p['status'] == 'active']
+    # active_players = [p for p in game_state['players'] if p['status'] == 'active']
+    # active_players = [p for p in game_state['players'] if p['status'] not in ['folded']]
+    active_players = [p for p in game_state['players'] if player_is_active(p)]
     
     if len(active_players) <= 1:
         # Only one player left, they win
@@ -270,6 +278,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     
     # Find next active player
     next_player_index = (player_index + 1) % len(game_state['players'])
+    # while game_state['players'][next_player_index]['status'] != 'active':
     while game_state['players'][next_player_index]['status'] != 'active':
         next_player_index = (next_player_index + 1) % len(game_state['players'])
     

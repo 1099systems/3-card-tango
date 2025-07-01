@@ -703,6 +703,15 @@ function updatePlayers() {
             nameElement.textContent += ' (Folded)';
         }
 
+        if (player.status === 'checked') {
+            nameElement.textContent += ' (Checked)';
+        }
+
+        if (player.status.includes('betted')) {
+            nameElement.textContent += ' (' + player.status + ')';
+        }
+
+
 
         if (player.cards) {
             // Add player cards
