@@ -175,6 +175,15 @@ def all_players_acted(players, bet_action):
         for p in players
     )
 
+def any_player_acted(players, bet_action):
+    return any(
+        'last_action' in p and (
+            p['last_action'].startswith(bet_action)
+        )
+        for p in players
+    )
+
+
 def move_to_turn_draw(game_state, table_id):
     from game import moveGameStateToNext
     moveGameStateToNext(game_state, table_id)

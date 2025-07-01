@@ -169,9 +169,16 @@ def betting_timer(table_id):
         current_player = game_state['players'][game_state['current_player_index']]
         
         # Default to fold if there's a bet, check if no bet
-        from helpers import process_betting_action
-        # TODO: logic below is not correct
-        not_bet_yet_except_from_ante = True #TODO
+        from helpers import any_player_acted, process_betting_action
+        not_bet_yet_except_from_ante = True
+
+        if game_state['state'] == 'pre_kick_betting':
+            not_bet_yet_except_from_ante = not any_player_acted(game_state['players'], 'pre_kick_bet')
+        elif game_state['state'] == 'post_turn_betting':
+            not_bet_yet_except_from_ante = not any_player_acted(game_state['players'], 'post_turn_bet')
+        elif game_state['state'] == 'final_betting':
+            not_bet_yet_except_from_ante = not any_player_acted(game_state['players'], 'final_bet')
+
         if not_bet_yet_except_from_ante:
             process_betting_action(current_player['id'], table_id, 'check', {})
         else:
