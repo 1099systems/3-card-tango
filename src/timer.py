@@ -10,7 +10,7 @@ def start_timer(phase, table_id):
     if timer_disabled:
         print('Timer is disabled. Please continue the game using manual console commands.')
         return
-    print('Starting timer...')
+    print('Starting timer ' + phase)
 
     if phase == 'card_draw':
         socketio.start_background_task(countdown_to_start, table_id)

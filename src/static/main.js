@@ -87,7 +87,7 @@ function debugNextPhase() {
     let newGameState = gameState;
 
     // debugMockGameStates();
-    
+
     fetch('/api/next-state', {
         method: 'POST',
         headers: {
@@ -153,7 +153,7 @@ function debugChooseCall(playerId) {
 }
 
 function debugChooseRaise(playerId, amount) {
-    processPlaceBet(playerId, amount+1);
+    processPlaceBet(playerId, amount + 1);
 }
 
 function processChooseTrash(sessionId, index) {
@@ -854,8 +854,15 @@ function updateControls() {
 
         }
 
-        displayBetControl(true);
-        // TODO: instead of index = 0, check if index == betting_player
+        // TODO: Test this
+        for (let i = 0; i < gameState.players.length; i++) {
+            if (gameState.currentPlayerIndex == i) {
+                displayBetControl(true);
+            } else {
+                displayBetControl(false);
+            }
+        }
+        
         if (gameState.currentPlayerIndex == 0) {
             checkBtn.classList.remove('hidden');
             betBtnTxt.innerHTML = 'Bet';

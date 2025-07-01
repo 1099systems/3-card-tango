@@ -176,6 +176,13 @@ def any_player_acted(players, bet_action):
         for p in players
     )
 
+def player_has_acted(player, bet_action):
+    return 'last_action' in player and (
+        player['last_action'] in ['check', 'fold'] or
+        player['last_action'].startswith(bet_action)
+    )
+
+
 def player_is_active(player):
     if player['status'] in ['folded']:
             return False
@@ -191,9 +198,10 @@ def move_to_board_reveal(game_state, table_id):
     from game import moveGameStateToNext
     moveGameStateToNext(game_state, table_id)
 
-def move_bet_to_next_player(game_state, next_player_index):
+def move_bet_to_next_player(game_state, next_player_index, table_id):
     game_state['current_player_index'] = next_player_index
     game_state['timer'] = timer_config['next_player']  # Reset timer for next player
+    start_timer('betting', table_id)
 
 def is_betting_allowed_from_game_state(game_state):
     if game_state or game_state['state'] in ['ante', 'pre_kick_betting', 'post_turn_betting', 'final_betting']:
@@ -281,33 +289,33 @@ def process_betting_action(player_id, table_id, action_type, action_data):
                 from game import moveGameStateToNext
                 moveGameStateToNext(game_state, table_id)
             else:
-                move_bet_to_next_player(game_state, next_player_index)
+                move_bet_to_next_player(game_state, next_player_index, table_id)
 
         elif state == 'pre_kick_betting':
             if all_players_acted(active_players, 'pre_kick_bet'):
                 move_to_turn_draw(game_state, table_id)
             else:
-                move_bet_to_next_player(game_state, next_player_index)
+                move_bet_to_next_player(game_state, next_player_index, table_id)
 
         elif state == 'post_turn_betting':
             # if next_player_index == game_state['current_player_index'] or all_players_acted(active_players, game_state['current_bet']):
             if all_players_acted(active_players, 'post_turn_bet'):
                 move_to_board_reveal(game_state, table_id)
             else:
-                move_bet_to_next_player(game_state, next_player_index)
+                move_bet_to_next_player(game_state, next_player_index, table_id)
 
         elif state == 'final_betting':
             # if next_player_index == game_state['current_player_index'] or all_players_acted(active_players, game_state['current_bet']):
             if all_players_acted(active_players, 'final_bet'):
                 end_hand(table_id)
             else:
-                move_bet_to_next_player(game_state, next_player_index)
+                move_bet_to_next_player(game_state, next_player_index, table_id)
 
     except Exception as e:
         # Optional: Add logging
         print(f"Error processing betting round: {e}")
         # Move to next player
-        move_bet_to_next_player(game_state, next_player_index)
+        move_bet_to_next_player(game_state, next_player_index, table_id)
     
     return True
 
