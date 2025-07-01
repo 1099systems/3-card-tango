@@ -565,12 +565,6 @@ h6,
     font-size: 1.5rem;
 }
 
-.keep-icon {
-    background-color: rgba(0, 255, 159, 0.2);
-    border: 2px solid var(--neon-green);
-    color: var(--neon-green);
-}
-
 .kill-icon {
     background-color: rgba(255, 42, 109, 0.2);
     border: 2px solid var(--neon-pink);
@@ -587,10 +581,6 @@ h6,
     font-family: "Orbitron", sans-serif;
     font-size: 0.9rem;
     text-transform: uppercase;
-}
-
-.keep-label {
-    color: var(--neon-green);
 }
 
 .kill-label {

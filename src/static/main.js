@@ -37,7 +37,6 @@ function debugMockGameStates(newGameState) {
                     },
                 ]
                 player['decisions'] = {
-                    'keep': null, // 0
                     'kick': null, // 2
                     'kill': null // 1
                 }

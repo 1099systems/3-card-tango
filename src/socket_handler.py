@@ -195,7 +195,7 @@ def handle_leave_table(data):
 
 @socketio.on('player_action')
 def handle_player_action(data):
-    """Handle player game actions (keep/kill/kick, check/bet/fold)."""
+    """Handle player game actions (kill/kick, check/bet/fold)."""
     session_id = data.get('session_id')
     table_id = data.get('table_id')
     action_type = data.get('action_type')
