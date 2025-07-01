@@ -64,6 +64,30 @@ def start_game(table_id):
     socketio.emit('game_state_update', game_state, room=f'table_{table_id}')
     socketio.emit('game_started', {}, room=f'table_{table_id}')
 
+def process_kill_card(player, hand_player):
+    try:
+        # Update database
+        with app.app_context():
+            killed_index = player['decisions']['kill']
+            killed_card = player['cards'][killed_index]
+            hand_player.killed_card = card_to_string(killed_card)
+            # Remove the killed card from the player's cards
+            player['cards'].pop(killed_index)
+            db.session.commit()
+    except:
+        print('Error processing kill card.')
+
+def process_kick_card(player, hand_player):
+    try:
+        kicked_index = player['decisions']['kick']
+        kicked_card = player['cards'][kicked_index]
+        kicked_card['is_tango'] = True
+        hand_player.kicked_card = card_to_string(kicked_card)
+        db.session.commit()
+    except:
+        print('Error processing kick card.')
+
+
 def process_classification_action(player_id, table_id, action_type, action_data):
     print('processing player action')
     """Process a classification action (kill/kick)."""
@@ -101,16 +125,9 @@ def process_classification_action(player_id, table_id, action_type, action_data)
             if hand_player:
                 # Convert the killed card index to string and assign it
                 if action_type == 'kill':
-                    killed_index = player['decisions']['kill']
-                    killed_card = player['cards'][killed_index]
-                    hand_player.killed_card = card_to_string(killed_card)
-                    # Remove the killed card from the player's cards
-                    player['cards'].pop(killed_index)
-                    db.session.commit()
+                    process_kill_card(player, hand_player)
                 elif action_type == 'kick':
-                    kicked_index = player['decisions']['kick']
-                    kicked_card = player['cards'][kicked_index]
-                    kicked_card['is_tango'] = True
+                    process_kick_card(player, hand_player)
                     db.session.commit()
 
     # Check if all players have made all decisions

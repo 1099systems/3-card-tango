@@ -89,33 +89,58 @@ def classification_timer(table_id):
         socketio.emit('timer_update', {'timer': game_state['timer']}, room=f'table_{table_id}')
     
     # Auto-decide for players who haven't made all decisions
-    for player in game_state['players']:
-        if None in [ player['decisions']['kill'], player['decisions']['kick']]:
-            # Make random decisions for missing actions
-            remaining_indices = [i for i in range(2) if i not in [
-                player['decisions']['kill'],
-                player['decisions']['kick']
-            ]]
-            
-            if player['decisions']['kill'] is None and remaining_indices:
-                player['decisions']['kill'] = remaining_indices.pop(0)
-            
-            if player['decisions']['kick'] is None and remaining_indices:
-                player['decisions']['kick'] = remaining_indices.pop(0)
-            
-            # Update database
-            with app.app_context():
-                hand = Hand.query.get(game_state['current_hand'])
-                if hand:
-                    hand_player = HandPlayer.query.filter_by(
-                        hand_id=hand.id,
-                        player_id=player['id']
-                    ).first()
-                    
-                    if hand_player:
-                        hand_player.killed_card = card_to_string(player['cards'][player['decisions']['kill']])
-                        hand_player.kicked_card = card_to_string(player['cards'][player['decisions']['kick']])
-                        db.session.commit()
+    if game_state['state'] in ['choose_trash']:
+        for player in game_state['players']:
+            if None in [ player['decisions']['kill']]:
+                # Make random decisions for missing actions
+                remaining_indices = [i for i in range(3) if i not in [
+                    player['decisions']['kill'],
+                    player['decisions']['kick']
+                ]]
+                
+                if player['decisions']['kill'] is None and remaining_indices:
+                    player['decisions']['kill'] = remaining_indices.pop(0)
+                
+                # Update database
+                with app.app_context():
+                    hand = Hand.query.get(game_state['current_hand'])
+                    if hand:
+                        hand_player = HandPlayer.query.filter_by(
+                            hand_id=hand.id,
+                            player_id=player['id']
+                        ).first()
+                        
+                        if hand_player:
+                            from helpers import process_kill_card
+                            process_kill_card(player, hand_player)
+    elif game_state['state'] in ['choose_tango']:
+        for player in game_state['players']:
+            if None in [player['decisions']['kick']]:
+                # Make random decisions for missing actions
+                remaining_indices = [i for i in range(2) if i not in [
+                    player['decisions']['kill'],
+                    player['decisions']['kick']
+                ]]
+                
+                if player['decisions']['kick'] is None and remaining_indices:
+                    player['decisions']['kick'] = remaining_indices.pop(0)
+                
+                # Update database
+                with app.app_context():
+                    hand = Hand.query.get(game_state['current_hand'])
+                    if hand:
+                        hand_player = HandPlayer.query.filter_by(
+                            hand_id=hand.id,
+                            player_id=player['id']
+                        ).first()
+                        
+                        if hand_player:
+                            from helpers import process_kick_card
+                            process_kick_card(player, hand_player)
+    else:
+        print('Invalid game state!')
+        return
+    
 
     from game import moveGameStateToNext
     moveGameStateToNext(game_state, table_id)
