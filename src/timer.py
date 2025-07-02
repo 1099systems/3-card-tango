@@ -183,6 +183,8 @@ def betting_timer(table_id):
             process_betting_action(current_player['id'], table_id, 'check', {})
         else:
             process_betting_action(current_player['id'], table_id, 'fold', {})
+
+    # TODO: move gamestate here if all players betted?
     
     # Send updated game state to all players
     socketio.emit('game_state_update', game_state, room=f'table_{table_id}')

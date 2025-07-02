@@ -11,82 +11,9 @@ async function debugAddPlayer(username) {
     });
 }
 
-function debugMockGameStates(newGameState) {
-    switch (gameState.state) {
-        case 'waiting':
-            newGameState.state = 'ante';
-            break;
-        case 'ante':
-            newGameState.state = 'card_draw';
-
-            newGameState.chat_enabled = false;
-            // countdown timer starts here
-            newGameState.players.forEach((player) => {
-                player['cards'] = [
-                    {
-                        'rank': '6',
-                        'suit': 'clubs'
-                    },
-                    {
-                        'rank': 'A',
-                        'suit': 'diamonds'
-                    },
-                    {
-                        'rank': 'J',
-                        'suit': 'clubs'
-                    },
-                ]
-                player['decisions'] = {
-                    'kick': null, // 2
-                    'kill': null // 1
-                }
-                player['last_action'] = 'check'
-                player['chips'] = 100
-
-            });
-
-            newGameState.current_hand = 0;
-            break;
-        case 'card_draw':
-            newGameState.state = 'choose_trash';
-            break;
-        case 'choose_trash':
-            newGameState.state = 'choose_tango';
-            newGameState.current_bet = ''
-            newGameState.current_player_index = ''
-            break;
-        case 'choose_tango':
-            newGameState.state = 'pre_kick_betting';
-            newGameState.current_bet = ''
-            newGameState.current_player_index = ''
-            break;
-        case 'pre_kick_betting':
-            // TODO: player bets, decrease player['chips'], increate gamestate['pot']
-            newGameState.state = 'turn_draw';
-            // new card drawn
-            break;
-        case 'turn_draw':
-            newGameState.state = 'post_turn_betting';
-            break;
-        case 'post_turn_betting':
-            newGameState.state = 'board_reveal';
-            break;
-        case 'board_reveal':
-            newGameState.state = 'final_betting';
-            break;
-        case 'end':
-            newGameState.state = 'next_game_countdown';
-            break;
-        default:
-            statusText = gameState.state;
-    }
-    return;
-}
 
 function debugNextPhase() {
     let newGameState = gameState;
-
-    // debugMockGameStates();
 
     fetch('/api/next-state', {
         method: 'POST',
@@ -381,7 +308,7 @@ function handleJoinTableResponse(response) {
 }
 
 function handleGameStateUpdate(state) {
-    console.log('Game state update:', state);
+    console.log('!!!!!!!!!!!Game state update:', state);
 
     // Update game state
     gameState.state = state.state;
@@ -860,20 +787,21 @@ function updateControls() {
         for (let i = 0; i < gameState.players.length; i++) {
             if (gameState.currentPlayerIndex == i) {
                 displayBetControl(true);
+        
+                if (gameState.currentPlayerIndex == 0) {
+                    checkBtn.classList.remove('hidden');
+                    betBtnTxt.innerHTML = 'Bet';
+                } else {
+                    foldBtn.classList.remove('hidden');
+                    callBtn.classList.remove('hidden');
+                    betBtnTxt.innerHTML = 'Raise';
+                    callValueDisplay.textContent = "(" + (parseInt(gameState.currentBet)) + ")"
+                    betValueDisplay.textContent = "(" + (parseInt(gameState.currentBet) + 1) + ")"
+                }
+                
             } else {
                 displayBetControl(false);
             }
-        }
-        
-        if (gameState.currentPlayerIndex == 0) {
-            checkBtn.classList.remove('hidden');
-            betBtnTxt.innerHTML = 'Bet';
-        } else {
-            foldBtn.classList.remove('hidden');
-            callBtn.classList.remove('hidden');
-            betBtnTxt.innerHTML = 'Raise';
-            callValueDisplay.textContent = "(" + (parseInt(gameState.currentBet)) + ")"
-            betValueDisplay.textContent = "(" + (parseInt(gameState.currentBet) + 1) + ")"
         }
 
         // Add event listeners

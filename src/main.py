@@ -19,10 +19,9 @@ timer_config = {
     'card_draw': 10,
     'choose_trash': 7,
     'choose_tango': 7,
-    'turn_draw': 5,
-    'betting': 7,
-    'board_reveal': 5,
-    'next_player': 7,
+    'turn_draw': 10,
+    'betting': 20,
+    'board_reveal': 10,
     'next_hand': 10,
 }
 

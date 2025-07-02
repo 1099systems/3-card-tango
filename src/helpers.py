@@ -199,8 +199,9 @@ def move_to_board_reveal(game_state, table_id):
     moveGameStateToNext(game_state, table_id)
 
 def move_bet_to_next_player(game_state, next_player_index, table_id):
+    print('Moving to next player for betting... Timer resetting...')
     game_state['current_player_index'] = next_player_index
-    game_state['timer'] = timer_config['next_player']  # Reset timer for next player
+    game_state['timer'] = timer_config['betting']
     start_timer('betting', table_id)
 
 def is_betting_allowed_from_game_state(game_state):
@@ -213,7 +214,7 @@ def is_betting_allowed_from_game_state(game_state):
 
 def process_betting_action(player_id, table_id, action_type, action_data):
     """Process a betting action (check/bet/fold)."""
-    print('processing player betting')
+    print('...processing player betting: ' + str(player_id) + ' ' + str(action_type))
     game_state = game_states.get(table_id)
     
     if not is_betting_allowed_from_game_state(game_state):
@@ -288,8 +289,6 @@ def process_betting_action(player_id, table_id, action_type, action_data):
             if all_players_anteed(active_players):
                 from game import moveGameStateToNext
                 moveGameStateToNext(game_state, table_id)
-            else:
-                move_bet_to_next_player(game_state, next_player_index, table_id)
 
         elif state == 'pre_kick_betting':
             if all_players_acted(active_players, 'pre_kick_bet'):
