@@ -785,22 +785,26 @@ function updateControls() {
 
         // TODO: Test this
         for (let i = 0; i < gameState.players.length; i++) {
-            if (gameState.currentPlayerIndex == i) {
+            if (gameState.players[i].id == currentPlayer.id) {
                 displayBetControl(true);
+                console.log('Current player is the playing player, showing bet controls');
         
                 if (gameState.currentPlayerIndex == 0) {
                     checkBtn.classList.remove('hidden');
                     betBtnTxt.innerHTML = 'Bet';
+                    console.log('Current player is first, showing check button');
                 } else {
                     foldBtn.classList.remove('hidden');
                     callBtn.classList.remove('hidden');
                     betBtnTxt.innerHTML = 'Raise';
                     callValueDisplay.textContent = "(" + (parseInt(gameState.currentBet)) + ")"
                     betValueDisplay.textContent = "(" + (parseInt(gameState.currentBet) + 1) + ")"
+                    console.log('Current player is not first, showing fold and call buttons');
                 }
-                
+                break;
             } else {
                 displayBetControl(false);
+                console.log('Current player is not the playing player, hiding bet controls');
             }
         }
 

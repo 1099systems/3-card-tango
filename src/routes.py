@@ -16,9 +16,48 @@ def index():
 def next_game_state():
     data = request.json
     game_state = data.get('game_state')
+    
+    print('Moving next game state from:')
     table_id = data.get('table_id')
     from game import moveGameStateToNext
-    moveGameStateToNext(game_state, table_id)
+    
+    state = game_state['state']
+    
+    # Move to next player or next phase
+    from helpers import player_is_active, all_players_acted, move_bet_to_next_player, move_to_turn_draw, move_to_board_reveal, end_hand 
+    active_players = [p for p in game_state['players'] if player_is_active(p)]
+    
+    # next_player_index = game_state['current_player_index']
+    next_player_index = (game_state['currentPlayerIndex'] + 1) % len(game_state['players'])
+    
+    while not player_is_active(game_state['players'][next_player_index]):
+        next_player_index = (next_player_index + 1) % len(game_state['players'])
+
+    if state == 'ante':
+        if all_players_acted(active_players, ['ante']):
+            from game import moveGameStateToNext
+            moveGameStateToNext(game_state, table_id)
+
+    elif state == 'pre_kick_betting':
+        if all_players_acted(active_players, ['pre_kick_check', 'pre_kick_bet']):
+            move_to_turn_draw(game_state, table_id)
+        else:
+            move_bet_to_next_player(game_state, next_player_index, table_id)
+
+    elif state == 'post_turn_betting':
+        if all_players_acted(active_players, ['post_turn_check', 'post_turn_bet']):
+            move_to_board_reveal(game_state, table_id)
+        else:
+            move_bet_to_next_player(game_state, next_player_index, table_id)
+
+    elif state == 'final_betting':
+        if all_players_acted(active_players, ['final_check', 'final_bet']):
+            end_hand(table_id)
+        else:
+            move_bet_to_next_player(game_state, next_player_index, table_id)
+    else:
+        moveGameStateToNext(game_state, table_id)
+
     return jsonify({
         'game_state': game_state,
     })
