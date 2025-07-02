@@ -640,6 +640,8 @@ function updatePlayerInfo() {
 function updateGameStatus() {
     let statusText = '';
 
+    var currentPlayer = gameState.players[gameState.currentPlayerIndex]?.username || 'Unknown';
+
     switch (gameState.state) {
         case 'waiting':
             statusText = 'Waiting for players...';
@@ -657,19 +659,19 @@ function updateGameStatus() {
             statusText = 'Choose Card to Tango!';
             break;
         case 'pre_kick_betting':
-            statusText = 'Pre-Draw-Card Betting Round';
+            statusText = 'Pre-Draw-Card Betting Round (' + currentPlayer +')';
             break;
         case 'turn_draw':
             statusText = 'Draw Card Round';
             break;
         case 'post_turn_betting':
-            statusText = 'Post-Draw-Card Betting Round';
+            statusText = 'Post-Draw-Card Betting Round (' + currentPlayer +')';
             break;
         case 'board_reveal':
             statusText = 'Community Cards Revealed';
             break;
         case 'final_betting':
-            statusText = 'Final Betting Round';
+            statusText = 'Final Betting Round (' + currentPlayer +')';
             break;
         case 'end':
             break;
