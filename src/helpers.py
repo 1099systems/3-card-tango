@@ -153,20 +153,14 @@ def process_classification_action(player_id, table_id, action_type, action_data)
     
     return True
 
-def all_players_anteed(players):
+def all_players_acted(players, actions):
     return all(
-        'last_action' in p and p['last_action'].startswith('ante')
-        for p in players
-    )
-
-def all_players_acted(players, bet_action):
-    return all(
-        'last_action' in p and (
-            p['last_action'] in ['check', 'fold'] or
-            p['last_action'].startswith(bet_action)
+        'last_action' in p and any(
+            p['last_action'].startswith(action) for action in actions
         )
         for p in players
     )
+
 
 def any_player_acted(players, bet_action):
     return any(
@@ -175,13 +169,6 @@ def any_player_acted(players, bet_action):
         )
         for p in players
     )
-
-def player_has_acted(player, bet_action):
-    return 'last_action' in player and (
-        player['last_action'] in ['check', 'fold'] or
-        player['last_action'].startswith(bet_action)
-    )
-
 
 def player_is_active(player):
     if player['status'] in ['folded']:
@@ -232,6 +219,13 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     if action_type == 'check':
         player['status'] = 'checked'
         player['last_action'] = 'check'
+        
+        if game_state['state'] in ['pre_kick_betting']:
+            player['last_action'] = f'pre_kick_check'
+        elif game_state['state'] in ['post_turn_betting']:
+            player['last_action'] = f'post_turn_check'
+        elif game_state['state'] in ['final_betting']:
+            player['last_action'] = f'final_check'
     
     elif action_type == 'bet':
         bet_amount = action_data.get('amount', 0)
@@ -264,6 +258,13 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     elif action_type == 'fold':
         player['status'] = 'folded'
         player['last_action'] = 'fold'
+        
+        if game_state['state'] in ['pre_kick_betting']:
+            player['last_action'] = f'pre_kick_fold'
+        elif game_state['state'] in ['post_turn_betting']:
+            player['last_action'] = f'post_turn_fold'
+        elif game_state['state'] in ['final_betting']:
+            player['last_action'] = f'final_fold'
     else:
         print('Invalid action type.')
         return False
@@ -273,6 +274,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     
     if len(active_players) <= 1:
         # Only one player left, they win
+        print('Only one player left, ending hand...')
         end_hand(table_id)
         return True
     
@@ -286,26 +288,24 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     try:
         state = game_state['state']
         if state == 'ante':
-            if all_players_anteed(active_players):
+            if all_players_acted(active_players, ['ante']):
                 from game import moveGameStateToNext
                 moveGameStateToNext(game_state, table_id)
 
         elif state == 'pre_kick_betting':
-            if all_players_acted(active_players, 'pre_kick_bet'):
+            if all_players_acted(active_players, ['pre_kick_check', 'pre_kick_bet']):
                 move_to_turn_draw(game_state, table_id)
             else:
                 move_bet_to_next_player(game_state, next_player_index, table_id)
 
         elif state == 'post_turn_betting':
-            # if next_player_index == game_state['current_player_index'] or all_players_acted(active_players, game_state['current_bet']):
-            if all_players_acted(active_players, 'post_turn_bet'):
+            if all_players_acted(active_players, ['post_turn_check', 'post_turn_bet']):
                 move_to_board_reveal(game_state, table_id)
             else:
                 move_bet_to_next_player(game_state, next_player_index, table_id)
 
         elif state == 'final_betting':
-            # if next_player_index == game_state['current_player_index'] or all_players_acted(active_players, game_state['current_bet']):
-            if all_players_acted(active_players, 'final_bet'):
+            if all_players_acted(active_players, ['final_check', 'final_bet']):
                 end_hand(table_id)
             else:
                 move_bet_to_next_player(game_state, next_player_index, table_id)
