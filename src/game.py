@@ -184,7 +184,7 @@ def moveGameStateToNext(game_state, table_id):
         start_timer('end', table_id)
 
     elif game_state['state'] == 'end':
-        game_state['state'] = 'next_game_countdown'
+        game_state['state'] = 'next_hand'
         # Start timer for next hand
         start_timer('next_hand', table_id)
         

@@ -602,7 +602,7 @@ function updateGameStatus() {
         case 'final_betting':
             statusText = 'Final Betting Round (' + currentPlayer + ')';
             break;
-        case 'showdownd':
+        case 'showdown':
             statusText = 'Showdown (Evaluating winners))';
             break;
         case 'end':

@@ -327,7 +327,7 @@ def get_winner(game_state):
             player['final_hand'] = player['cards'] + [player['turn_card']] + game_state['community_cards']
             
             # Calculate hand strength (simplified for now)
-            player['hand_strength'] = calculate_hand_strength(player['final_hand'])
+            player['hand_strength'] = determine_hand_strength(player['final_hand'])
         
         # Find player with highest hand strength
         winner = max(active_players, key=lambda p: p['hand_strength'])
@@ -346,8 +346,10 @@ def end_hand(table_id):
     moveGameStateToNext(game_state, table_id)
     
 
-def calculate_hand_strength(cards):
+def determine_hand_strength(cards):
     """Calculate the strength of a poker hand (simplified version)."""
     # This is a simplified version - in a real implementation, you would use a proper poker hand evaluator
     # For now, just return a random value for demonstration
-    return random.randint(1, 1000)
+    print('Determining hand strength for cards..')
+    from poker import calculate_hand_strength
+    return calculate_hand_strength(cards)
