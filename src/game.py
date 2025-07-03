@@ -120,6 +120,7 @@ def moveGameStateToNext(game_state, table_id):
         game_state['current_player_index'] = 0
         start_timer('betting', table_id)
     elif game_state['state'] == 'final_betting':
+        game_state['timer'] = timer_config['showdown']
         game_state['state'] = 'showdown'
         start_timer('showdown', table_id)
     elif game_state['state'] == 'showdown':

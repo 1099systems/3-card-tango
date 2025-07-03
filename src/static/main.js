@@ -603,7 +603,7 @@ function updateGameStatus() {
             statusText = 'Final Betting Round (' + currentPlayer + ')';
             break;
         case 'showdown':
-            statusText = 'Showdown (Evaluating winners))';
+            statusText = 'Showdown (Determining winners..)';
             break;
         case 'end':
             statusText = 'Congratulations!';
@@ -616,6 +616,10 @@ function updateGameStatus() {
     }
 
     gameStatusElement.textContent = statusText;
+}
+
+function convertToTitleCase(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
 }
 
 function updatePlayers() {
@@ -654,9 +658,8 @@ function updatePlayers() {
         }
 
         if (p.status.includes('betted')) {
-            nameElement.textContent += ' (' + p.status + ')';
+            nameElement.textContent += ' (' + convertToTitleCase(p.status) + ')';
         }
-
 
 
         if (p.cards) {
@@ -735,6 +738,27 @@ function displayBetControl(display) {
     betControl.classList.add('hidden');
     betBtn.classList.add('hidden');
 }
+
+function didPreviousPlayerMakeABet(gameState) {
+    const { players, currentPlayerIndex } = gameState;
+
+    if (!Array.isArray(players) || players.length === 0) return false;
+
+    const prevIndex = (currentPlayerIndex - 1 + players.length) % players.length;
+    const prevPlayer = players[prevIndex];
+
+    const action = prevPlayer.last_action || '';
+
+    // Check if last_action starts with any known bet prefix
+    return (
+        action.startsWith('pre_kick_bet') ||
+        action.startsWith('post_turn_bet') ||
+        action.startsWith('final_bet')
+    );
+}
+
+
+
 function updateControls() {
     // Hide all controls
     cardActionsTrash.classList.add('hidden');
@@ -815,7 +839,7 @@ function updateControls() {
             displayBetControl(true);
             console.log('Current player is the playing player, showing bet controls');
 
-            if (gameState.currentPlayerIndex == 0) {
+            if (gameState.currentPlayerIndex == 0 || !didPreviousPlayerMakeABet(gameState)) { // Add condition, if index=0 hasn't made a bet
                 checkBtn.classList.remove('hidden');
                 betBtnTxt.innerHTML = 'Bet';
                 console.log('Current player is first, showing check button');
