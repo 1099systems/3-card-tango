@@ -342,7 +342,7 @@ function handleGameStarted() {
     console.log('Game started');
 
     // Add chat message
-    addSystemChatMessage('Game started');a
+    addSystemChatMessage('Game started'); a
 }
 
 let displayedTime = 0;
@@ -415,7 +415,13 @@ function selectCard(cardIndex) {
     updatePlayerCards();
 }
 
+let isProcessingAction = false;
 function selectAction(sessionId, action, card_index) {
+    if (isProcessingAction) {
+        console.warn('Action already in progress, ignoring...');
+        return;
+    };
+    
     if (gameState.selectedCard === null) {
         alert('Please select a card first');
         return;
@@ -584,19 +590,19 @@ function updateGameStatus() {
             statusText = 'Choose Card to Tango!';
             break;
         case 'pre_kick_betting':
-            statusText = 'Pre-Draw-Card Betting Round (' + currentPlayer +')';
+            statusText = 'Pre-Draw-Card Betting Round (' + currentPlayer + ')';
             break;
         case 'turn_draw':
             statusText = 'Draw Card Round';
             break;
         case 'post_turn_betting':
-            statusText = 'Post-Draw-Card Betting Round (' + currentPlayer +')';
+            statusText = 'Post-Draw-Card Betting Round (' + currentPlayer + ')';
             break;
         case 'board_reveal':
             statusText = 'Community Cards Revealed';
             break;
         case 'final_betting':
-            statusText = 'Final Betting Round (' + currentPlayer +')';
+            statusText = 'Final Betting Round (' + currentPlayer + ')';
             break;
         case 'end':
             break;
@@ -749,17 +755,35 @@ function updateControls() {
         }
 
         // Add event listeners
-        document.getElementById('kill-action-1')?.addEventListener('click', () => processChooseTrash(player.sessionId, 0), { once: true });
-        document.getElementById('kill-action-2')?.addEventListener('click', () => processChooseTrash(player.sessionId, 1), { once: true });
-        document.getElementById('kill-action-3')?.addEventListener('click', () => processChooseTrash(player.sessionId, 2), { once: true });
+        document.getElementById('kill-action-1')?.addEventListener('click', (e) => {
+            e.currentTarget.disabled = true;
+            processChooseTrash(player.sessionId, 0);
+        }, { once: true });
+        document.getElementById('kill-action-2')?.addEventListener('click', (e) => {
+            e.currentTarget.disabled = true;
+            processChooseTrash(player.sessionId, 1);
+        }, { once: true });
+        document.getElementById('kill-action-3')?.addEventListener('click', (e) => {
+            e.currentTarget.disabled = true;
+            processChooseTrash(player.sessionId, 2);
+        }, { once: true });
     } else if (gameState.state === 'choose_tango') {
         if (currentPlayer.decisions.kick == null) {
             cardActionsTango.classList.remove('hidden');
         }
 
-        document.getElementById('kick-action-1')?.addEventListener('click', () => processChooseTango(player.sessionId, 0), { once: true });
-        document.getElementById('kick-action-2')?.addEventListener('click', () => processChooseTango(player.sessionId, 1), { once: true });
-        document.getElementById('kick-action-3')?.addEventListener('click', () => processChooseTango(player.sessionId, 2), { once: true });
+        document.getElementById('kick-action-1')?.addEventListener('click', (e) => {
+            e.currentTarget.disabled = true;
+            processChooseTango(player.sessionId, 0);
+        }, { once: true });
+        document.getElementById('kick-action-2')?.addEventListener('click', (e) => {
+            e.currentTarget.disabled = true;
+            processChooseTango(player.sessionId, 1);
+        }, { once: true });
+        document.getElementById('kick-action-3')?.addEventListener('click', (e) => {
+            e.currentTarget.disabled = true;
+            processChooseTango(player.sessionId, 2);
+        }, { once: true });
 
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
         if (gameState.state == 'pre_kick_betting' && currentPlayer.last_action.includes('pre_kick_bet')) {
@@ -781,7 +805,7 @@ function updateControls() {
             if (gameState.players[i].id == currentPlayer.id) {
                 displayBetControl(true);
                 console.log('Current player is the playing player, showing bet controls');
-        
+
                 if (gameState.currentPlayerIndex == 0) {
                     checkBtn.classList.remove('hidden');
                     betBtnTxt.innerHTML = 'Bet';
