@@ -10,8 +10,6 @@ def moveGameStateToNext(game_state, table_id):
         game_state['state'] = 'ante'
         game_state['current_player_index'] = 0
         game_state['current_bet'] = 0
-        # game_state['timer'] = 10  # 10 second countdown to start
-        # start_timer('start', suitable_table.id)
     elif game_state['state'] == 'ante':
         game_state['state'] = 'card_draw'
         game_state['timer'] = timer_config['card_draw']

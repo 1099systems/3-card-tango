@@ -26,7 +26,6 @@ function debugNextPhase() {
         })
     }).then(async (response) => {
         const data = await response.json();
-        console.log(data);
         newGameState = data.game_state
         handleGameStateUpdate(newGameState);
     });
@@ -308,7 +307,7 @@ function handleJoinTableResponse(response) {
 }
 
 function handleGameStateUpdate(state) {
-    console.log('!!!!!!!!!!!Game state update:', state);
+    console.log('Game state update:', state);
 
     // Update game state
     gameState.state = state.state;
@@ -343,7 +342,7 @@ function handleGameStarted() {
     console.log('Game started');
 
     // Add chat message
-    addSystemChatMessage('Game started');
+    addSystemChatMessage('Game started');a
 }
 
 let displayedTime = 0;
@@ -351,6 +350,7 @@ let lastUpdateTime = Date.now();
 let timerInterval;
 
 function handleTimerUpdate(data) {
+    console.log('Timer update:', data);
     // Display it incase it is hidden (value 0)
     timerElement.style.display = 'block';
 
@@ -443,8 +443,6 @@ function placeBet() {
     if (betAmount === null) {
         return;
     }
-    console.log('bet value')
-    console.log(betValue)
 
     const amount = parseInt(betAmount);
 
@@ -645,23 +643,21 @@ function updatePlayers() {
         }
 
         if (p.status.includes('betted')) {
-            nameElement.textContent += ' (' + player.status + ')';
+            nameElement.textContent += ' (' + p.status + ')';
         }
 
 
 
-        if (player.cards) {
+        if (p.cards) {
             // Add player cards
-            console.log('adding cards for ' + player);
-            player.cards.forEach((card, index) => {
+            p.cards.forEach((card, index) => {
                 const cardElement = createBackFacingCardElement();
 
                 playerCardsElement.appendChild(cardElement);
             });
-            console.log('added cards!');
 
             // Add turn card if available
-            if (player.turn_card) {
+            if (p.turn_card) {
                 const turnCard = createBackFacingCardElement();
                 playerCardsElement.appendChild(turnCard);
             }
@@ -696,7 +692,6 @@ function updateCommunityCards() {
 }
 
 function updatePlayerCards() {
-    console.log('updating player cards...');
     // Clear player cards
     playerCardsElement.innerHTML = '';
 
@@ -705,13 +700,11 @@ function updatePlayerCards() {
 
     if (currentPlayer && currentPlayer.cards) {
         // Add player cards
-        console.log('adding player cards for ' + currentPlayer);
         currentPlayer.cards.forEach((card, index) => {
             const cardElement = createCardElement(card);
 
             playerCardsElement.appendChild(cardElement);
         });
-        console.log('added player cards!');
 
         // Add turn card if available
         if (currentPlayer.turn_card) {
@@ -733,7 +726,6 @@ function displayBetControl(display) {
 }
 function updateControls() {
     // Hide all controls
-    console.log('updating controls...')
     cardActionsTrash.classList.add('hidden');
     cardActionsTango.classList.add('hidden');
     checkBtn.classList.add('hidden');
@@ -770,8 +762,6 @@ function updateControls() {
         document.getElementById('kick-action-3')?.addEventListener('click', () => processChooseTango(player.sessionId, 2), { once: true });
 
     } else if (['pre_kick_betting', 'post_turn_betting', 'final_betting'].includes(gameState.state)) {
-        console.log('In a post-ante betting round...')
-
         if (gameState.state == 'pre_kick_betting' && currentPlayer.last_action.includes('pre_kick_bet')) {
             console.log('Player already made a bet in this betting round')
             return;

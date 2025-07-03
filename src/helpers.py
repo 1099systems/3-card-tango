@@ -180,6 +180,9 @@ def move_bet_to_next_player(game_state, next_player_index, table_id):
     game_state['current_player_index'] = next_player_index
     game_state['timer'] = timer_config['betting']
     start_timer('betting', table_id)
+    # TODO: I think we don't need code below?
+    from main import socketio
+    socketio.emit('game_state_update', game_state, room=f'table_{table_id}')
 
 def is_betting_allowed_from_game_state(game_state):
     if game_state or game_state['state'] in ['ante', 'pre_kick_betting', 'post_turn_betting', 'final_betting']:
