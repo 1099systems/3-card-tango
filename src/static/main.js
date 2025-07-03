@@ -361,7 +361,6 @@ function handleTimerUpdate(data) {
 
     // Start smooth countdown
     timerInterval = setInterval(() => {
-
         const now = Date.now();
         const elapsed = (now - lastUpdateTime) / 1000;
         const remaining = Math.max(0, displayedTime - elapsed);
@@ -606,7 +605,7 @@ function updateGameStatus() {
             statusText = 'Showdown (Determining winners..)';
             break;
         case 'end':
-            statusText = 'Congratulations!';
+            statusText = 'Congratulations to the winner!';
             break;
         case 'next_hand':
             statusText = 'Next game starting in 3...';
