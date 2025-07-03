@@ -46,6 +46,7 @@ async function getPlayerOrCreate(sessionId, username) {
 
         const data = await response.json();
         const newPlayer = {};
+        console.log('Player data:', data);
         newPlayer.id = data.id;
         newPlayer.sessionId = data.session_id;
         newPlayer.username = data.username;
@@ -160,10 +161,7 @@ gameState = {
 init();
 
 function init() {
-    // Check if player exists
-    if (player.sessionId) {
-        fetchPlayerData();
-    }
+    fetchPlayerData();
 
     // Event Listeners
     joinBtn.addEventListener('click', joinTable);

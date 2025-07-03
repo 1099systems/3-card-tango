@@ -20,7 +20,7 @@ timer_config = {
     'choose_trash': 3,
     'choose_tango': 3,
     'turn_draw': 5,
-    'betting': 5,
+    'betting': 20,
     'board_reveal': 5,
     'next_hand': 5,
 }

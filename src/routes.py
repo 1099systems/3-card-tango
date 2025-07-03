@@ -96,8 +96,11 @@ def set_username():
     session_id = data.get('session_id')
     username = data.get('username')
     
-    if not session_id or not username:
-        return jsonify({'error': 'Session ID and username are required'}), 400
+    if not session_id:
+        return jsonify({'error': 'Session ID is required'}), 400
+    
+    if not username:
+        return jsonify({'error': 'Username is required'}), 400
     
     player = Player.query.filter_by(session_id=session_id).first()
     
