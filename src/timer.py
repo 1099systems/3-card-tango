@@ -22,6 +22,10 @@ def start_timer(phase, table_id):
         socketio.start_background_task(turn_draw_timer, table_id)
     elif phase == 'board_reveal':
         socketio.start_background_task(board_reveal_timer, table_id)
+    elif phase == 'showdown':
+        socketio.start_background_task(showdown_timer, table_id)
+    elif phase == 'next_hand':
+        socketio.start_background_task(end_timer, table_id)
     elif phase == 'next_hand':
         socketio.start_background_task(next_hand_timer, table_id)
 
@@ -48,6 +52,40 @@ def turn_draw_timer(table_id):
     game_state = game_states.get(table_id)
     
     if not game_state or game_state['state'] != 'turn_draw':
+        print('Invalid game state.')
+        return
+    
+    while game_state['timer'] > 0:
+        socketio.sleep(0.5)
+        game_state['timer'] = round(game_state['timer'] - 0.5, 2)
+        socketio.emit('timer_update', {'timer': game_state['timer']}, room=f'table_{table_id}')
+    
+    from game import moveGameStateToNext
+    moveGameStateToNext(game_state, table_id)
+
+    
+def end_timer(table_id):
+    table_id = int(table_id)
+    game_state = game_states.get(table_id)
+    
+    if not game_state or game_state['state'] != 'showdown':
+        print('Invalid game state.')
+        return
+    
+    while game_state['timer'] > 0:
+        socketio.sleep(0.5)
+        game_state['timer'] = round(game_state['timer'] - 0.5, 2)
+        socketio.emit('timer_update', {'timer': game_state['timer']}, room=f'table_{table_id}')
+    
+    from game import moveGameStateToNext
+    moveGameStateToNext(game_state, table_id)
+
+
+def showdown_timer(table_id):
+    table_id = int(table_id)
+    game_state = game_states.get(table_id)
+    
+    if not game_state or game_state['state'] != 'showdown':
         print('Invalid game state.')
         return
     

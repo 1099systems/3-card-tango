@@ -393,7 +393,7 @@ function handleChatMessage(message) {
 function handleHandResult(result) {
     console.log('Hand result:', result);
 
-    winnerMessage = `🏆 Player ${result.winner.username || 'Anonymous'} Wins Pot! (${result.pot_amount})`;
+    winnerMessage = `🏆 ${result.winner.username || 'Anonymous'} Wins Pot! (${result.pot_amount})`;
     // Add chat message
     alert(winnerMessage);
     addSystemChatMessage(winnerMessage);
@@ -602,7 +602,14 @@ function updateGameStatus() {
         case 'final_betting':
             statusText = 'Final Betting Round (' + currentPlayer + ')';
             break;
+        case 'showdownd':
+            statusText = 'Showdown (Evaluating winners))';
+            break;
         case 'end':
+            statusText = 'Congratulations!';
+            break;
+        case 'next_hand':
+            statusText = 'Next game starting in 3...';
             break;
         default:
             statusText = gameState.state;
