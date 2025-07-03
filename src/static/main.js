@@ -620,7 +620,7 @@ function updatePlayers() {
     }
 
     // Add players
-    gameState.players.forEach((player, index) => {
+    gameState.players.forEach((p, index) => {
         const position = document.getElementById(`position-${index}`);
         position.style.visibility = 'visible';
 
@@ -629,19 +629,22 @@ function updatePlayers() {
         const playerCardsElement = position.querySelector('.player-cards');
 
 
-        nameElement.textContent = player.username || `Player ${player.id}`;
-        chipsElement.textContent = player.chips + ' chips';
+        nameElement.textContent = p.username || `Player ${p.id}`;
+        if (p.id === player.id) {
+            nameElement.textContent += ` (You)`;
+        }
+        chipsElement.textContent = p.chips + ' chips';
 
         // Add status indicator if folded
-        if (player.status === 'folded') {
+        if (p.status === 'folded') {
             nameElement.textContent += ' (Folded)';
         }
 
-        if (player.status === 'checked') {
+        if (p.status === 'checked') {
             nameElement.textContent += ' (Checked)';
         }
 
-        if (player.status.includes('betted')) {
+        if (p.status.includes('betted')) {
             nameElement.textContent += ' (' + player.status + ')';
         }
 
