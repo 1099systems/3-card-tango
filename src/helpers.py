@@ -82,7 +82,7 @@ def process_kick_card(player, hand_player):
 
 
 def process_classification_action(player_id, table_id, action_type, action_data):
-    print('processing player action')
+    print('Processing classification action:', player_id, action_type, action_data)
     """Process a classification action (kill/kick)."""
     game_state = game_states.get(table_id)
     

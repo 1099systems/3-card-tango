@@ -421,7 +421,7 @@ function selectAction(sessionId, action, card_index) {
         console.warn('Action already in progress, ignoring...');
         return;
     };
-    
+
     if (gameState.selectedCard === null) {
         alert('Please select a card first');
         return;
@@ -740,6 +740,7 @@ function updateControls() {
     displayBetControl(false);
 
     const currentPlayer = gameState.players.find(p => p.id === player.id);
+    const currentPlayerIndex = gameState.players.findIndex(p => p.id === player.id);
 
     // Show appropriate controls based on game state
     if (gameState.state == 'ante') {
@@ -800,30 +801,32 @@ function updateControls() {
 
         }
 
-        // TODO: Test this
-        for (let i = 0; i < gameState.players.length; i++) {
-            if (gameState.players[i].id == currentPlayer.id) {
-                displayBetControl(true);
-                console.log('Current player is the playing player, showing bet controls');
-
-                if (gameState.currentPlayerIndex == 0) {
-                    checkBtn.classList.remove('hidden');
-                    betBtnTxt.innerHTML = 'Bet';
-                    console.log('Current player is first, showing check button');
-                } else {
-                    foldBtn.classList.remove('hidden');
-                    callBtn.classList.remove('hidden');
-                    betBtnTxt.innerHTML = 'Raise';
-                    callValueDisplay.textContent = "(" + (parseInt(gameState.currentBet)) + ")"
-                    betValueDisplay.textContent = "(" + (parseInt(gameState.currentBet) + 1) + ")"
-                    console.log('Current player is not first, showing fold and call buttons');
-                }
-                break;
-            } else {
-                displayBetControl(false);
-                console.log('Current player is not the playing player, hiding bet controls');
-            }
+        let isCurrentPlayerTurn = false;
+        if (gameState.currentPlayerIndex == currentPlayerIndex) {
+            isCurrentPlayerTurn = true;
         }
+
+        if (isCurrentPlayerTurn) {
+            displayBetControl(true);
+            console.log('Current player is the playing player, showing bet controls');
+
+            if (gameState.currentPlayerIndex == 0) {
+                checkBtn.classList.remove('hidden');
+                betBtnTxt.innerHTML = 'Bet';
+                console.log('Current player is first, showing check button');
+            } else {
+                foldBtn.classList.remove('hidden');
+                callBtn.classList.remove('hidden');
+                betBtnTxt.innerHTML = 'Raise';
+                callValueDisplay.textContent = "(" + parseInt(gameState.currentBet) + ")";
+                betValueDisplay.textContent = "(" + (parseInt(gameState.currentBet) + 1) + ")";
+                console.log('Current player is not first, showing fold and call buttons');
+            }
+        } else {
+            displayBetControl(false);
+            console.log('Current player is not the playing player, hiding bet controls');
+        }
+
 
         // Add event listeners
         document.getElementById('check-btn').onclick = check;

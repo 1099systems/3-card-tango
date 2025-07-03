@@ -17,12 +17,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 timer_config = {
     'card_draw': 3,
-    'choose_trash': 30,
-    'choose_tango': 30,
-    'turn_draw': 10,
-    'betting': 30,
-    'board_reveal': 10,
-    'next_hand': 10,
+    'choose_trash': 3,
+    'choose_tango': 3,
+    'turn_draw': 5,
+    'betting': 5,
+    'board_reveal': 5,
+    'next_hand': 5,
 }
 
 # Initialize SocketIO
