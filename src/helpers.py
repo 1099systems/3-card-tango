@@ -125,6 +125,7 @@ def process_classification_action(player_id, table_id, action_type, action_data)
 
     # Check if all players have made all decisions
     all_decisions_made = True
+    from game import moveGameStateToNext
     if game_state['state'] == 'choose_trash':
         for p in game_state['players']:
             if None in [p['decisions']['kill']]:
@@ -134,7 +135,6 @@ def process_classification_action(player_id, table_id, action_type, action_data)
         
         if all_decisions_made:
             print('all decisions have been made!')
-            from game import moveGameStateToNext
             moveGameStateToNext(game_state, table_id)
     elif game_state['state'] == 'choose_tango':
         for p in game_state['players']:
@@ -145,7 +145,6 @@ def process_classification_action(player_id, table_id, action_type, action_data)
         
         if all_decisions_made:
             print('all decisions have been made!')
-            from game import moveGameStateToNext
             moveGameStateToNext(game_state, table_id)
     else:
         # invalid
@@ -176,15 +175,6 @@ def player_is_active(player):
     
     return True
 
-
-def move_to_turn_draw(game_state, table_id):
-    from game import moveGameStateToNext
-    moveGameStateToNext(game_state, table_id)
-
-def move_to_board_reveal(game_state, table_id):
-    from game import moveGameStateToNext
-    moveGameStateToNext(game_state, table_id)
-
 def move_bet_to_next_player(game_state, next_player_index, table_id):
     print('Moving to next player for betting... Timer resetting...')
     game_state['current_player_index'] = next_player_index
@@ -201,6 +191,7 @@ def is_betting_allowed_from_game_state(game_state):
 
 def process_betting_action(player_id, table_id, action_type, action_data):
     """Process a betting action (check/bet/fold)."""
+    from game import moveGameStateToNext
     print('...processing player betting: ' + str(player_id) + ' ' + str(action_type))
     game_state = game_states.get(table_id)
     
@@ -275,12 +266,11 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     if len(active_players) <= 1:
         # Only one player left, they win
         print('Only one player left, ending hand...')
-        end_hand(table_id)
+        moveGameStateToNext(game_state, table_id)
         return True
     
     # Find next active player
     next_player_index = (player_index + 1) % len(game_state['players'])
-    # while game_state['players'][next_player_index]['status'] != 'active':
     while not player_is_active(game_state['players'][next_player_index]):
         next_player_index = (next_player_index + 1) % len(game_state['players'])
     
@@ -289,24 +279,26 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         state = game_state['state']
         if state == 'ante':
             if all_players_acted(active_players, ['ante']):
-                from game import moveGameStateToNext
                 moveGameStateToNext(game_state, table_id)
 
         elif state == 'pre_kick_betting':
             if all_players_acted(active_players, ['pre_kick_check', 'pre_kick_bet']):
-                move_to_turn_draw(game_state, table_id)
+                # Move to turn_draw phase
+                moveGameStateToNext(game_state, table_id)
             else:
                 move_bet_to_next_player(game_state, next_player_index, table_id)
 
         elif state == 'post_turn_betting':
             if all_players_acted(active_players, ['post_turn_check', 'post_turn_bet']):
-                move_to_board_reveal(game_state, table_id)
+                # Move to board_reveal phase        
+                moveGameStateToNext(game_state, table_id)
             else:
                 move_bet_to_next_player(game_state, next_player_index, table_id)
 
         elif state == 'final_betting':
             if all_players_acted(active_players, ['final_check', 'final_bet']):
-                end_hand(table_id)
+                # Move to end hand phase
+                moveGameStateToNext(game_state, table_id)
             else:
                 move_bet_to_next_player(game_state, next_player_index, table_id)
 

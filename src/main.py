@@ -16,10 +16,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL') + '_' +  uuid.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 timer_config = {
-    'card_draw': 1,
-    'choose_trash': 1,
-    'choose_tango': 1,
-    'turn_draw': 1,
+    'card_draw': 3,
+    'choose_trash': 3,
+    'choose_tango': 3,
+    'turn_draw': 3,
     'betting': 30,
     'board_reveal': 10,
     'next_hand': 10,
