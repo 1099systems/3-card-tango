@@ -233,6 +233,11 @@ def process_betting_action(player_id, table_id, action_type, action_data):
             return False
         
         player['chips'] -= bet_amount
+        player['current_bet'] = bet_amount
+        player['is_all_in'] = False
+        if player['current_bet'] == player['chips']:
+            player['is_all_in'] = True
+
         game_state['pot'] += bet_amount
         game_state['current_bet'] = bet_amount
 
@@ -312,6 +317,29 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         move_bet_to_next_player(game_state, next_player_index, table_id)
     
     return True
+
+
+def get_sidepot_winner(game_state):
+    # Determine winner
+    active_players = [p for p in game_state['players'] if player_is_active(p)]
+
+    if len(active_players) == 1:
+        # Only one player left, they win
+        winner = active_players[0]
+    else:
+        # Compare hands
+        for player in active_players:
+            # Combine kept card, turn card, and community cards
+            player['final_hand'] = player['cards'] + [player['turn_card']] + game_state['community_cards']
+            
+            # Calculate hand strength (simplified for now)
+            player['hand_strength'] = determine_hand_strength(player['final_hand'])
+        
+        # Find player with highest hand strength
+        winner = max(active_players, key=lambda p: p['hand_strength'])
+
+    return winner
+
 
 def get_winner(game_state):
     # Determine winner

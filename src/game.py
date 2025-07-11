@@ -126,10 +126,14 @@ def moveGameStateToNext(game_state, table_id):
     elif game_state['state'] == 'showdown':
         game_state['state'] = 'end'
 
+        # Sidepot winner
+        from helpers import get_sidepot_winner
+        sidepot_winner = get_sidepot_winner(game_state)
+        sidepot_winner['chips'] += game_state['sidepot']
+
+
         from helpers import get_winner
-        # Determine winner
         winner = get_winner(game_state)
-        
         # Award pot to winner
         winner['chips'] += game_state['pot']
         
