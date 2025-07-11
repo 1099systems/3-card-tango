@@ -191,7 +191,7 @@ def is_betting_allowed_from_game_state(game_state):
     if game_state or game_state['state'] in ['ante', 'pre_kick_betting', 'post_turn_betting', 'final_betting']:
         return True
     
-    print(f"Error processing betting, invalid game state: {e}")
+    print(f"Error processing betting, invalid game state: {game_state}")
     return False
 
 
@@ -213,6 +213,8 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     player = game_state['players'][player_index]
     
     # Process action
+    # Reset current_bet
+    player['current_bet'] = 0
     if action_type == 'check':
         player['status'] = 'checked'
         player['last_action'] = 'check'
@@ -237,30 +239,13 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         
         player['chips'] -= bet_amount
         player['current_bet'] = bet_amount
+        player['total_bet'] += player['current_bet']
         player['is_all_in'] = False
         if player['current_bet'] == player['chips']:
             player['is_all_in'] = True
 
         game_state['pot'] += bet_amount
         game_state['current_bet'] = bet_amount
-
-
-        # Assume players is a list of player objects or dicts with a 'bet' field
-        all_bets = [p['current_bet'] for p in game_state['players']]  # or p['bet'] if using dicts
-        min_bet = min(all_bets)
-
-        # Main pot is sum of min_bet from all players
-        main_pot = len(game_state['players']) * min_bet
-
-        # Side pot: amount over minBet from players who bet more
-        playerA.extra = playerA.bet - minBet; // 100 - 50 = 50
-
-        sidePot = {
-            amount: 50,
-            eligiblePlayers: [playerA]
-        };
-
-        game_state['side_pots'] = side_pots
 
         if game_state['state'] in ['ante']:
             player['last_action'] = f'ante {bet_amount}'
@@ -340,13 +325,43 @@ def process_betting_action(player_id, table_id, action_type, action_data):
     return True
 
 
-def get_sidepot_winner(game_state):
-    # Determine winner
+def calculate_side_pots(game_state):
+    if 'side_pots' not in game_state:
+        game_state['side_pots'] = []
+
+    # Make a copy of players with total_bet > 0
     active_players = get_active_players(game_state)
 
-    # TODO
+    while active_players:
+        # Get minimum total_bet among remaining players
+        min_bet = min(p['total_bet'] for p in active_players)
 
-    return winner
+        # Players who have at least min_bet are contributing to this pot
+        contributors = [p for p in active_players if p['total_bet'] >= min_bet]
+
+        # The amount of the pot is min_bet times number of contributors
+        pot_amount = min_bet * len(contributors)
+
+        # Create and store the side pot
+        side_pot = {
+            'amount': pot_amount,
+            'eligible_players': [p['id'] for p in contributors]
+        }
+        game_state['side_pots'].append(side_pot)
+
+        # Subtract min_bet from all contributors
+        for p in active_players:
+            p['total_bet'] -= min_bet
+
+        # Remove players who have contributed all their chips
+        active_players = [p for p in active_players if p['total_bet'] > 0]
+
+    print('BATMAN sidepots is:')
+    print(game_state['side_pots'])
+
+    return game_state['side_pots']
+
+
 
 
 def get_winner(game_state):

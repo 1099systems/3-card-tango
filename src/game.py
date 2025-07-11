@@ -126,16 +126,45 @@ def moveGameStateToNext(game_state, table_id):
     elif game_state['state'] == 'showdown':
         game_state['state'] = 'end'
 
-        # Sidepot winner
-        from helpers import get_sidepot_winner
-        sidepot_winner = get_sidepot_winner(game_state)
-        if 'sidepot' in game_state and game_state['sidepot'] > 0 and sidepot_winner:
-            sidepot_winner['chips'] += game_state['sidepot']
+        from helpers import calculate_side_pots, get_winner, determine_hand_strength
 
-        from helpers import get_winner
-        winner = get_winner(game_state)
-        # Award pot to winner
-        winner['chips'] += game_state['pot']
+        # Step 1: Calculate side pots
+        side_pots = calculate_side_pots(game_state)
+
+        # Step 2: Determine winners for each pot
+        awarded_players = {}
+
+        for pot in side_pots:
+            # Only consider eligible players for this pot
+            eligible_players = [p for p in game_state['players'] if p['id'] in pot['eligible_players']]
+
+            if len(eligible_players) == 1:
+                winner = eligible_players[0]
+            else:
+                # Evaluate hand strengths among eligible players
+                for player in eligible_players:
+                    player['final_hand'] = player['cards'] + [player['turn_card']] + game_state['community_cards']
+                    player['hand_strength'] = determine_hand_strength(player['final_hand'])
+
+                winner = max(eligible_players, key=lambda p: p['hand_strength'])
+
+            # Award pot to winner
+            winner['chips'] += pot['amount']
+            awarded_players[pot['amount']] = winner['id']
+
+        # Step 3: Determine winner of the remaining main pot (if any)
+        # If side pots consumed entire pot, this may be 0
+        remaining_pot = game_state.get('pot', 0)
+        if remaining_pot > 0:
+            main_winner = get_winner(game_state)
+            main_winner['chips'] += remaining_pot
+            awarded_players[remaining_pot] = main_winner['id']
+
+        # Optional: print or log who won which pot
+        print("🏆 Pot results:")
+        for amt, winner_name in awarded_players.items():
+            print(f"→ {winner_name} won {amt} chips")
+
         
         # Update database
         with app.app_context():
@@ -170,9 +199,9 @@ def moveGameStateToNext(game_state, table_id):
             
 
         game_state['winner'] = {
-            'id': winner['id'],
-            'username': winner['username'],
-            'hand_strength': winner.get('hand_strength', 0)
+            'id': main_winner['id'],
+            'username': main_winner['username'],
+            'hand_strength': main_winner.get('hand_strength', 0)
         }
         game_state['chat_enabled'] = True  # Re-enable chat
         game_state['timer'] = timer_config['next_hand']  # 10 seconds before next hand
