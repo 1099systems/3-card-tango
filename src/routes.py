@@ -24,8 +24,8 @@ def next_game_state():
     state = game_state['state']
     
     # Move to next player or next phase
-    from helpers import player_is_active, all_players_acted, move_bet_to_next_player
-    active_players = [p for p in game_state['players'] if player_is_active(p)]
+    from helpers import player_is_active, all_players_acted, move_bet_to_next_player, get_active_players
+    active_players = get_active_players(game_state)
     
     # next_player_index = game_state['current_player_index']
     next_player_index = (game_state['currentPlayerIndex'] + 1) % len(game_state['players'])

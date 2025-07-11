@@ -169,6 +169,9 @@ def any_player_acted(players, bet_action):
         for p in players
     )
 
+def get_active_players(game_state):
+    return [p for p in game_state['players'] if player_is_active(p)]
+
 def player_is_active(player):
     if player['status'] in ['folded']:
             return False
@@ -241,6 +244,24 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         game_state['pot'] += bet_amount
         game_state['current_bet'] = bet_amount
 
+
+        # Assume players is a list of player objects or dicts with a 'bet' field
+        all_bets = [p['current_bet'] for p in game_state['players']]  # or p['bet'] if using dicts
+        min_bet = min(all_bets)
+
+        # Main pot is sum of min_bet from all players
+        main_pot = len(game_state['players']) * min_bet
+
+        # Side pot: amount over minBet from players who bet more
+        playerA.extra = playerA.bet - minBet; // 100 - 50 = 50
+
+        sidePot = {
+            amount: 50,
+            eligiblePlayers: [playerA]
+        };
+
+        game_state['side_pots'] = side_pots
+
         if game_state['state'] in ['ante']:
             player['last_action'] = f'ante {bet_amount}'
         elif game_state['state'] in ['pre_kick_betting']:
@@ -269,7 +290,7 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         return False
     
     # Move to next player or next phase
-    active_players = [p for p in game_state['players'] if player_is_active(p)]
+    active_players = get_active_players(game_state)
     
     if len(active_players) <= 1:
         # Only one player left, they win
@@ -321,29 +342,16 @@ def process_betting_action(player_id, table_id, action_type, action_data):
 
 def get_sidepot_winner(game_state):
     # Determine winner
-    active_players = [p for p in game_state['players'] if player_is_active(p)]
+    active_players = get_active_players(game_state)
 
-    if len(active_players) == 1:
-        # Only one player left, they win
-        winner = active_players[0]
-    else:
-        # Compare hands
-        for player in active_players:
-            # Combine kept card, turn card, and community cards
-            player['final_hand'] = player['cards'] + [player['turn_card']] + game_state['community_cards']
-            
-            # Calculate hand strength (simplified for now)
-            player['hand_strength'] = determine_hand_strength(player['final_hand'])
-        
-        # Find player with highest hand strength
-        winner = max(active_players, key=lambda p: p['hand_strength'])
+    # TODO
 
     return winner
 
 
 def get_winner(game_state):
     # Determine winner
-    active_players = [p for p in game_state['players'] if player_is_active(p)]
+    active_players = get_active_players(game_state)
 
     if len(active_players) == 1:
         # Only one player left, they win

@@ -62,8 +62,8 @@ def moveGameStateToNext(game_state, table_id):
         start_timer('betting', table_id)
     elif game_state['state'] == 'pre_kick_betting':
         game_state['state'] = 'turn_draw'
-        from helpers import player_is_active
-        active_players = [p for p in game_state['players'] if player_is_active(p)]
+        from helpers import get_active_players
+        active_players = get_active_players(game_state)
         for player in active_players:
             player['turn_card'] = deal_cards(game_state['deck'], 1)[0]
 
@@ -129,8 +129,8 @@ def moveGameStateToNext(game_state, table_id):
         # Sidepot winner
         from helpers import get_sidepot_winner
         sidepot_winner = get_sidepot_winner(game_state)
-        sidepot_winner['chips'] += game_state['sidepot']
-
+        if 'sidepot' in game_state and game_state['sidepot'] > 0 and sidepot_winner:
+            sidepot_winner['chips'] += game_state['sidepot']
 
         from helpers import get_winner
         winner = get_winner(game_state)
