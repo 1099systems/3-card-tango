@@ -239,7 +239,8 @@ def process_betting_action(player_id, table_id, action_type, action_data):
         
         player['chips'] -= bet_amount
         player['current_bet'] = bet_amount
-        player['total_bet'] += player['current_bet']
+        player['total_bet'] = player.get('total_bet', 0) + player['current_bet']
+
         player['is_all_in'] = False
         if player['current_bet'] == player['chips']:
             player['is_all_in'] = True

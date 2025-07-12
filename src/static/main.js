@@ -2,6 +2,7 @@ var gameState;
 
 // Socket Connection
 const socket = io();
+let winnerMessage = '';
 
 async function debugAddPlayer(username) {
     getPlayerOrCreate(username, username).then((result) => {
@@ -392,8 +393,22 @@ function handleChatMessage(message) {
 function handleHandResult(result) {
     console.log('Hand result:', result);
 
-    winnerMessage = `🏆 ${result.winner.username || 'Anonymous'} Wins Pot! (${result.pot_amount})`;
+    winnerMessage = `🏆Congratulations to the winners!`;
+
+    let winnerList = '';
+    for (const winner of result.winners) {
+        if (winner.is_main_winner) {
+            winnerList += `🏆 ${winner.username || 'Anonymous'} Wins Main Pot (${winner.amount_won}) \n`;
+        } else {
+            winnerList += `🥈 ${winner.username || 'Anonymous'} Wins Side Pot (${winner.amount_won}) \n`;
+        }
+    }
+
+    winnerMessage += winnerList
+
+    // winnerMessage = `🏆Congratulations to the winners! ${result.winner.username || 'Anonymous'} Wins Pot! (${result.pot_amount})`;
     // Add chat message
+    
     alert(winnerMessage);
     addSystemChatMessage(winnerMessage);
     gameStatusElement.textContent = winnerMessage;
@@ -605,7 +620,7 @@ function updateGameStatus() {
             statusText = 'Showdown (Determining winners..)';
             break;
         case 'end':
-            statusText = 'Congratulations to the winner!';
+            statusText = winnerMessage;
             break;
         case 'next_hand':
             statusText = 'Next game starting in 3...';
