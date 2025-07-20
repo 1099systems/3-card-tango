@@ -221,7 +221,7 @@ def moveGameStateToNext(game_state, table_id):
             
 
         game_state['chat_enabled'] = True  # Re-enable chat
-        game_state['timer'] = timer_config['next_hand']  # 10 seconds before next hand
+        game_state['timer'] = timer_config['end']  # 10 seconds before next hand
 
         # Send hand result to all players
         socketio.emit('hand_result', {
@@ -236,6 +236,7 @@ def moveGameStateToNext(game_state, table_id):
     elif game_state['state'] == 'end':
         game_state['state'] = 'next_hand'
         # Start timer for next hand
+        game_state['timer'] = timer_config['next_hand']  # 10 seconds before next hand
         start_timer('next_hand', table_id)
         
     socketio.emit('game_state_update', game_state, room=f'table_{table_id}')

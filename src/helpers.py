@@ -51,6 +51,7 @@ def start_game(table_id):
     game_state = game_states.get(table_id)
     
     if not game_state:
+        print('Invalid table ID or game state not found.')
         return
     
     # Update game state

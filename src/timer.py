@@ -234,7 +234,7 @@ def next_hand_timer(table_id):
     table_id = int(table_id)
     game_state = game_states.get(table_id)
     
-    if not game_state or game_state['state'] != 'end':
+    if not game_state or game_state['state'] != 'next_hand':
         return
     
     while game_state['timer'] > 0:
