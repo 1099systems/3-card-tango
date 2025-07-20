@@ -623,7 +623,7 @@ function updateGameStatus() {
             statusText = winnerMessage;
             break;
         case 'next_hand':
-            statusText = 'Next game starting in 3...';
+            statusText = 'Next game starting in';
             break;
         default:
             statusText = gameState.state;

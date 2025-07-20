@@ -24,7 +24,7 @@ def start_timer(phase, table_id):
         socketio.start_background_task(board_reveal_timer, table_id)
     elif phase == 'showdown':
         socketio.start_background_task(showdown_timer, table_id)
-    elif phase == 'next_hand':
+    elif phase == 'end':
         socketio.start_background_task(end_timer, table_id)
     elif phase == 'next_hand':
         socketio.start_background_task(next_hand_timer, table_id)
