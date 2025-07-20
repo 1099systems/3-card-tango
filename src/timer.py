@@ -261,6 +261,12 @@ def next_hand_timer(table_id):
         if 'last_action' in player:
             del player['last_action']
     
+    # Reset game state
+    game_state['state'] = 'waiting'
+
+    # Reset community cards
+    game_state['community_cards'] = []
+    
     # Start new hand
     from helpers import start_game
     start_game(table_id)

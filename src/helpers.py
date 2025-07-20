@@ -60,6 +60,10 @@ def start_game(table_id):
 
 def process_kill_card(player, hand_player):
     try:
+        if player['cards'] is None or len(player['cards']) < 3:
+            print('Invalid player cards for kill action.')
+            return
+        
         # Update database
         with app.app_context():
             killed_index = player['decisions']['kill']
@@ -73,6 +77,10 @@ def process_kill_card(player, hand_player):
 
 def process_kick_card(player, hand_player):
     try:
+        if player['cards'] is None or len(player['cards']) < 2:
+            print('Invalid player cards for kick action.')
+            return
+        
         kicked_index = player['decisions']['kick']
         kicked_card = player['cards'][kicked_index]
         kicked_card['is_tango'] = True
