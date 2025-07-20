@@ -590,7 +590,7 @@ function updateGameStatus() {
             statusText = 'Waiting for players...';
             break;
         case 'ante':
-            statusText = 'Before starting, please put an ante in the pot.';
+            statusText = 'Please put an ante in the pot.';
             break;
         case 'card_draw':
             statusText = 'Cards are drawn. Game starting soon...';
