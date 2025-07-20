@@ -68,7 +68,7 @@ def end_timer(table_id):
     table_id = int(table_id)
     game_state = game_states.get(table_id)
     
-    if not game_state or game_state['state'] != 'showdown':
+    if not game_state or game_state['state'] != 'end':
         print('Invalid game state.')
         return
     

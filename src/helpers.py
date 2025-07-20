@@ -327,6 +327,12 @@ def process_betting_action(player_id, table_id, action_type, action_data):
 
 
 def calculate_side_pots(game_state):
+    # Only calculate side pots if at least one player is all-in
+    if not any(player.get('is_all_in') for player in game_state.get('players', [])):
+        print("No all-in players. No side pots needed.")
+        game_state['side_pots'] = []
+        return []
+
     if 'side_pots' not in game_state:
         game_state['side_pots'] = []
 
