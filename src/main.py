@@ -23,8 +23,8 @@ timer_config = {
     'betting': 10,
     'board_reveal': 5,
     'showdown': 5,
-    'end': 2,
-    'next_hand': 3,
+    'end': 4,
+    'next_hand': 5,
 }
 
 # Initialize SocketIO
