@@ -393,14 +393,15 @@ function handleChatMessage(message) {
 function handleHandResult(result) {
     console.log('Hand result:', result);
 
-    winnerMessage = `🏆Congratulations to the winners!`;
+    // winnerMessage = `🏆Congratulations to the winners! \n\n`;
+    winnerMessage = ``;
 
     let winnerList = '';
     for (const winner of result.winners) {
         if (winner.is_main_winner) {
-            winnerList += `🏆 ${winner.username || 'Anonymous'} Wins Main Pot (${winner.amount_won}) \n`;
+            winnerList += `🏆 ${winner.username || 'Anonymous'} Wins Main Pot (${winner.amount_won})`;
         } else {
-            winnerList += `🥈 ${winner.username || 'Anonymous'} Wins Side Pot (${winner.amount_won}) \n`;
+            winnerList += `\n\n🥈 ${winner.username || 'Anonymous'} Wins Side Pot (${winner.amount_won})`;
         }
     }
 
@@ -411,7 +412,9 @@ function handleHandResult(result) {
     
     alert(winnerMessage);
     addSystemChatMessage(winnerMessage);
-    gameStatusElement.textContent = winnerMessage;
+    // gameStatusElement.textContent = winnerMessage;
+    gameStatusElement.innerHTML = winnerMessage.replace(/\n/g, '<br>');
+
 }
 
 function handleError(error) {

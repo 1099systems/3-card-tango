@@ -23,7 +23,7 @@ timer_config = {
     'betting': 10,
     'board_reveal': 5,
     'showdown': 5,
-    'end': 4,
+    'end': 10,
     'next_hand': 5,
 }
 
